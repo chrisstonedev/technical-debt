@@ -193,7 +193,7 @@ Private Sub getMainButton_Click()
 End Sub
 
 Private Sub getAltButton_Click()
-    Call SendGetRequest(TextUserId.Text)
+    Call SendGetRequest(userIdTextBox.Text)
 End Sub
 
 Private Sub postButton_Click()
@@ -204,16 +204,16 @@ Private Sub postButton_Click()
     httpRequest.Open "POST", url, False
     httpRequest.SetRequestHeader "Content-type", "application/json"
 
-    Dim XMLDoc As DOMDocument60
-    Dim successfulload As Boolean
-    Set XMLDoc = New DOMDocument60
-    successfulload = XMLDoc.loadXML(getOutputXmlTextBox.Text)
-    If successfulload Then
+    Dim xmlDocument As DOMDocument60
+    Dim successfulLoad As Boolean
+    Set xmlDocument = New DOMDocument60
+    successfulLoad = xmlDocument.loadXML(getOutputXmlTextBox.Text)
+    If successfulLoad Then
         Dim node As IXMLDOMNode
-        Dim nodelist As IXMLDOMNodeList
-        Set nodelist = XMLDoc.selectNodes("/xml/*")
+        Dim nodeList As IXMLDOMNodeList
+        Set nodeList = xmlDocument.selectNodes("/xml/*")
         Dim jsonText As String
-        For Each node In nodelist
+        For Each node In nodeList
             If Len(jsonText) = 0 Then
                 jsonText = "{""" + node.baseName + """: """ + node.Text + """"
             Else
@@ -224,7 +224,7 @@ Private Sub postButton_Click()
             jsonText = jsonText + "}"
         End If
     Else
-        getOutputXmlTextBox.Text = XMLDoc.parseError.reason
+        getOutputXmlTextBox.Text = xmlDocument.parseError.reason
         getOutputXmlTextBox.ForeColor = vbRed
         Exit Sub
     End If
@@ -253,70 +253,14 @@ Private Sub SendGetRequest(Optional ByVal customFirstName As String = "")
     responseText = httpRequest.responseText
     getOutputJsonTextBox.Text = responseText
     statusCodeTextBox.Text = ""
-    Dim xmlDocument As DOMDocument60
-    Dim xmlElement As IXMLDOMElement
+    Dim xmlString As String
     If Len(customFirstName) > 0 Then
-        Set xmlDocument = New DOMDocument60
-        Set xmlElement = xmlDocument.appendChild(xmlDocument.createElement("Myinfo"))
-        xmlElement.appendChild(xmlDocument.createElement("FirstName")).Text = "My First Name"
-        xmlElement.appendChild(xmlDocument.createElement("LastName")).Text = "My Last Name"
-        xmlElement.appendChild(xmlDocument.createElement("StreetAdd")).Text = "My Address"
-
-        If Len(customFirstName) > 0 Then
-            Dim xmlNode As IXMLDOMNode
-            Set xmlNode = xmlDocument.selectSingleNode("/Myinfo/FirstName")
-            xmlNode.Text = customFirstName
-        End If
+        xmlString = CreateXmlWithCustomFirstName(customFirstName)
     Else
-        Set xmlDocument = New DOMDocument60
-        Set xmlElement = xmlDocument.appendChild(xmlDocument.createElement("xml"))
-
-        Dim savedQuoteCharacterLocation As Integer
-        Dim lastLoopHadAStartQuote As Boolean
-        Dim lastLoopHadFullAttribute As Boolean
-        Dim attributeName As String
-        Do
-            Dim searchCharacter As String
-            If lastLoopHadFullAttribute Then
-                searchCharacter = ","
-            Else
-                searchCharacter = """"
-            End If
-            Dim currentQuoteCharacterLocation As Integer
-            currentQuoteCharacterLocation = InStr(savedQuoteCharacterLocation + 1, responseText, searchCharacter, vbTextCompare)
-            If currentQuoteCharacterLocation = 0 And lastLoopHadFullAttribute Then
-                searchCharacter = "}"
-                currentQuoteCharacterLocation = InStr(savedQuoteCharacterLocation + 1, responseText, searchCharacter, vbTextCompare)
-            End If
-            If currentQuoteCharacterLocation = 0 Then
-                Exit Do
-            Else
-                If lastLoopHadFullAttribute Then
-                    Dim currentValue As String
-                    currentValue = Replace(Replace(Trim(Mid(responseText, savedQuoteCharacterLocation + 2, currentQuoteCharacterLocation - savedQuoteCharacterLocation - 2)), vbCr, ""), vbLf, "")
-                    If Len(currentValue) >= 2 And Left(currentValue, 1) = """" And Right(currentValue, 1) = """" Then
-                        currentValue = Mid(currentValue, 2, Len(currentValue) - 2)
-                    End If
-
-                    xmlElement.appendChild(xmlDocument.createElement(attributeName)).Text = currentValue
-
-                    lastLoopHadFullAttribute = False
-                Else
-                    If lastLoopHadAStartQuote Then
-                        attributeName = Mid(responseText, savedQuoteCharacterLocation + 1, currentQuoteCharacterLocation - savedQuoteCharacterLocation - 1)
-
-                        lastLoopHadAStartQuote = False
-                        lastLoopHadFullAttribute = True
-                    Else
-                        lastLoopHadAStartQuote = True
-                    End If
-                End If
-            End If
-            savedQuoteCharacterLocation = currentQuoteCharacterLocation
-        Loop
+        xmlString = GenerateXmlFromJson(responseText)
     End If
 
-    getOutputXmlTextBox.Text = xmlDocument.xml
+    getOutputXmlTextBox.Text = xmlString
     statusCodeTextBox.Text = httpRequest.Status
     If httpRequest.Status <> 201 Then
         statusCodeTextBox.ForeColor = vbRed
@@ -324,3 +268,72 @@ Private Sub SendGetRequest(Optional ByVal customFirstName As String = "")
         statusCodeTextBox.ForeColor = vbBlack
     End If
 End Sub
+
+Private Function CreateXmlWithCustomFirstName(ByVal customFirstName As String) As String
+    Dim xmlDocument As DOMDocument60
+    Set xmlDocument = New DOMDocument60
+    Dim xmlElement As IXMLDOMElement
+    Set xmlElement = xmlDocument.appendChild(xmlDocument.createElement("Myinfo"))
+    xmlElement.appendChild(xmlDocument.createElement("FirstName")).Text = "My First Name"
+    xmlElement.appendChild(xmlDocument.createElement("LastName")).Text = "My Last Name"
+    xmlElement.appendChild(xmlDocument.createElement("StreetAdd")).Text = "My Address"
+
+    If Len(customFirstName) > 0 Then
+        Dim xmlNode As IXMLDOMNode
+        Set xmlNode = xmlDocument.selectSingleNode("/Myinfo/FirstName")
+        xmlNode.Text = customFirstName
+    End If
+    CreateXmlWithCustomFirstName = xmlDocument.xml
+End Function
+
+Private Function GenerateXmlFromJson(ByVal json As String) As String
+    Dim xmlDocument As DOMDocument60
+    Set xmlDocument = New DOMDocument60
+    Dim xmlElement As IXMLDOMElement
+    Set xmlElement = xmlDocument.appendChild(xmlDocument.createElement("xml"))
+
+    Dim savedQuoteCharacterLocation As Integer
+    Dim lastLoopHadAStartQuote As Boolean
+    Dim lastLoopHadFullAttribute As Boolean
+    Dim attributeName As String
+    Do
+        Dim searchCharacter As String
+        If lastLoopHadFullAttribute Then
+            searchCharacter = ","
+        Else
+            searchCharacter = """"
+        End If
+        Dim currentQuoteCharacterLocation As Integer
+        currentQuoteCharacterLocation = InStr(savedQuoteCharacterLocation + 1, json, searchCharacter, vbTextCompare)
+        If currentQuoteCharacterLocation = 0 And lastLoopHadFullAttribute Then
+            searchCharacter = "}"
+            currentQuoteCharacterLocation = InStr(savedQuoteCharacterLocation + 1, json, searchCharacter, vbTextCompare)
+        End If
+        If currentQuoteCharacterLocation = 0 Then
+            Exit Do
+        Else
+            If lastLoopHadFullAttribute Then
+                Dim currentValue As String
+                currentValue = Replace(Replace(Trim(Mid(json, savedQuoteCharacterLocation + 2, currentQuoteCharacterLocation - savedQuoteCharacterLocation - 2)), vbCr, ""), vbLf, "")
+                If Len(currentValue) >= 2 And Left(currentValue, 1) = """" And Right(currentValue, 1) = """" Then
+                    currentValue = Mid(currentValue, 2, Len(currentValue) - 2)
+                End If
+
+                xmlElement.appendChild(xmlDocument.createElement(attributeName)).Text = currentValue
+
+                lastLoopHadFullAttribute = False
+            Else
+                If lastLoopHadAStartQuote Then
+                    attributeName = Mid(json, savedQuoteCharacterLocation + 1, currentQuoteCharacterLocation - savedQuoteCharacterLocation - 1)
+
+                    lastLoopHadAStartQuote = False
+                    lastLoopHadFullAttribute = True
+                Else
+                    lastLoopHadAStartQuote = True
+                End If
+            End If
+        End If
+        savedQuoteCharacterLocation = currentQuoteCharacterLocation
+    Loop
+    GenerateXmlFromJson xmlDocument.xml
+End Function
