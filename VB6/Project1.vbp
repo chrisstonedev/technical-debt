@@ -2,6 +2,7 @@ Type=Exe
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{662901FC-6951-4854-9EB2-D9A2570F2B2E}#5.1#0#..\..\..\..\..\..\..\WINDOWS\system32\winhttpcom.dll#Microsoft WinHTTP Services, version 5.1
 Reference=*\G{F5078F18-C551-11D3-89B9-0000F81FE221}#6.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\msxml6.dll#Microsoft XML, v6.0
+Reference=*\G{F60A126A-7A6A-4011-AC1A-C33263623C0F}#1.0#0#..\WindowsFormsApp\ClassLibrary\bin\Debug\ClassLibrary.tlb#ClassLibrary
 Object={248DD890-BB45-11CF-9ABC-0080C7E7B78D}#1.0#0; MSWINSCK.OCX
 Form=Form1.frm
 IconForm="Form1"
