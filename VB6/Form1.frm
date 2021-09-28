@@ -9,7 +9,7 @@ Begin VB.Form Form1
    ScaleHeight     =   7350
    ScaleWidth      =   9735
    StartUpPosition =   3  'Windows Default
-   Begin VB.TextBox txtOJ 
+   Begin VB.TextBox postOutputJsonTextBox 
       Enabled         =   0   'False
       Height          =   1455
       Left            =   4800
@@ -18,7 +18,7 @@ Begin VB.Form Form1
       Top             =   4440
       Width           =   4095
    End
-   Begin VB.TextBox txtPJ 
+   Begin VB.TextBox postTranslateJsonTextBox 
       Enabled         =   0   'False
       Height          =   1455
       Left            =   120
@@ -27,7 +27,7 @@ Begin VB.Form Form1
       Top             =   4440
       Width           =   4335
    End
-   Begin VB.CommandButton cmdGA 
+   Begin VB.CommandButton getAltButton 
       Caption         =   "GET alt"
       Height          =   735
       Left            =   7560
@@ -35,7 +35,7 @@ Begin VB.Form Form1
       Top             =   720
       Width           =   1095
    End
-   Begin VB.TextBox txtGX 
+   Begin VB.TextBox getOutputXmlTextBox 
       Enabled         =   0   'False
       Height          =   1455
       Left            =   4800
@@ -44,7 +44,7 @@ Begin VB.Form Form1
       Top             =   2520
       Width           =   4095
    End
-   Begin VB.TextBox txtStatus 
+   Begin VB.TextBox statusCodeTextBox 
       Enabled         =   0   'False
       Height          =   285
       Left            =   7200
@@ -52,7 +52,7 @@ Begin VB.Form Form1
       Top             =   90
       Width           =   1335
    End
-   Begin VB.TextBox txtGJ 
+   Begin VB.TextBox getOutputJsonTextBox 
       Enabled         =   0   'False
       Height          =   1455
       Left            =   120
@@ -61,7 +61,7 @@ Begin VB.Form Form1
       Top             =   2520
       Width           =   4335
    End
-   Begin VB.CommandButton btnPOST 
+   Begin VB.CommandButton postButton 
       Caption         =   "POST"
       Height          =   495
       Left            =   5880
@@ -69,7 +69,7 @@ Begin VB.Form Form1
       Top             =   1560
       Width           =   2775
    End
-   Begin VB.CommandButton btnGM 
+   Begin VB.CommandButton getMainButton 
       Caption         =   "GET main"
       Height          =   735
       Left            =   5880
@@ -77,14 +77,14 @@ Begin VB.Form Form1
       Top             =   720
       Width           =   1455
    End
-   Begin VB.Frame Frame1 
+   Begin VB.Frame userIdFrame 
       Caption         =   "User ID"
       Height          =   495
       Left            =   0
       TabIndex        =   0
       Top             =   0
       Width           =   2535
-      Begin VB.TextBox TextUserId 
+      Begin VB.TextBox userIdTextBox 
          Appearance      =   0  'Flat
          BackColor       =   &H8000000F&
          BorderStyle     =   0  'None
@@ -106,14 +106,14 @@ Begin VB.Form Form1
          Width           =   2415
       End
    End
-   Begin VB.Frame Frame3 
+   Begin VB.Frame methodFrame 
       Caption         =   "Method"
       Height          =   495
       Left            =   2700
       TabIndex        =   1
       Top             =   0
       Width           =   1215
-      Begin VB.TextBox txtMethod 
+      Begin VB.TextBox methodTextBox 
          Appearance      =   0  'Flat
          BackColor       =   &H8000000F&
          BorderStyle     =   0  'None
@@ -135,7 +135,7 @@ Begin VB.Form Form1
          Width           =   900
       End
    End
-   Begin VB.Label Label5 
+   Begin VB.Label statusCodeLabel 
       Caption         =   "Status Code:"
       Height          =   375
       Left            =   5880
@@ -188,29 +188,26 @@ Private Sub Form_Initialize()
     Set OurNewMethods = New ClassLibrary.NewMethods
 End Sub
 
-Private Sub btnGM_Click()
-    Debug.Print OurNewMethods.ReturnFive
-    GtSubr
+Private Sub getMainButton_Click()
+    SendGetRequest
 End Sub
 
-Private Sub cmdGA_Click()
-    GtSubr TextUserId.Text
+Private Sub getAltButton_Click()
+    Call SendGetRequest(TextUserId.Text)
 End Sub
 
-Private Sub btnPOST_Click()
-    Dim httpURL As WinHttp.WinHttpRequest
-    Dim UrlString As String
-    Dim Output As String
-
-    Set httpURL = New WinHttp.WinHttpRequest
-    UrlString = "https://jsonplaceholder.typicode.com/posts"
-    httpURL.Open "POST", UrlString, False
-    httpURL.SetRequestHeader "Content-type", "application/json"
+Private Sub postButton_Click()
+    Dim httpRequest As WinHttp.WinHttpRequest
+    Set httpRequest = New WinHttp.WinHttpRequest
+    Dim url As String
+    url = "https://jsonplaceholder.typicode.com/posts"
+    httpRequest.Open "POST", url, False
+    httpRequest.SetRequestHeader "Content-type", "application/json"
 
     Dim XMLDoc As DOMDocument60
     Dim successfulload As Boolean
     Set XMLDoc = New DOMDocument60
-    successfulload = XMLDoc.loadXML(txtGX.Text)
+    successfulload = XMLDoc.loadXML(getOutputXmlTextBox.Text)
     If successfulload Then
         Dim node As IXMLDOMNode
         Dim nodelist As IXMLDOMNodeList
@@ -227,127 +224,103 @@ Private Sub btnPOST_Click()
             jsonText = jsonText + "}"
         End If
     Else
-        txtGX.Text = XMLDoc.parseError.reason
-        txtGX.ForeColor = vbRed
+        getOutputXmlTextBox.Text = XMLDoc.parseError.reason
+        getOutputXmlTextBox.ForeColor = vbRed
         Exit Sub
     End If
 
-    txtPJ.Text = jsonText
-    httpURL.Send jsonText
-    Output = httpURL.ResponseText
-    txtOJ.Text = Output
-    txtStatus.Text = httpURL.Status
-    If httpURL.Status <> 201 Then
-        txtStatus.ForeColor = vbRed
+    postTranslateJsonTextBox.Text = jsonText
+    httpRequest.Send jsonText
+    Dim output As String
+    output = httpRequest.responseText
+    postOutputJsonTextBox.Text = output
+    statusCodeTextBox.Text = httpRequest.Status
+    If httpRequest.Status <> 201 Then
+        statusCodeTextBox.ForeColor = vbRed
     Else
-        txtStatus.ForeColor = vbBlack
+        statusCodeTextBox.ForeColor = vbBlack
     End If
 End Sub
 
-Private Sub GtSubr(Optional ByVal strCFN As String = "")
-    Dim objWhr As WinHttp.WinHttpRequest
-    Dim strTmp As String
-    Dim strOtp As String
-    Dim objXml As DOMDocument60
-    Dim objXrt As IXMLDOMElement
-    Dim objXnd As IXMLDOMNode
-    Dim intNTQCL As Integer
-    Dim intQCL As Integer
-    Dim blnLTWSQ As Boolean
-    Dim blnLTWFA As Boolean
-    Dim strNOA As String
-    Dim strSCh As String
-    Dim strCVl As String
+Private Sub SendGetRequest(Optional ByVal customFirstName As String = "")
+    Dim httpRequest As WinHttp.WinHttpRequest
+    Set httpRequest = New WinHttp.WinHttpRequest
+    Dim url As String
+    url = "https://jsonplaceholder.typicode.com/todos/1"
+    httpRequest.Open "GET", url
+    httpRequest.Send
+    Dim responseText As String
+    responseText = httpRequest.responseText
+    getOutputJsonTextBox.Text = responseText
+    statusCodeTextBox.Text = ""
+    Dim xmlDocument As DOMDocument60
+    Dim xmlElement As IXMLDOMElement
+    If Len(customFirstName) > 0 Then
+        Set xmlDocument = New DOMDocument60
+        Set xmlElement = xmlDocument.appendChild(xmlDocument.createElement("Myinfo"))
+        xmlElement.appendChild(xmlDocument.createElement("FirstName")).Text = "My First Name"
+        xmlElement.appendChild(xmlDocument.createElement("LastName")).Text = "My Last Name"
+        xmlElement.appendChild(xmlDocument.createElement("StreetAdd")).Text = "My Address"
 
-    Set objWhr = New WinHttp.WinHttpRequest
-    strTmp = "https://jsonplaceholder.typicode.com/todos/1"
-    objWhr.Open "GET", strTmp
-    objWhr.Send
-    strOtp = objWhr.ResponseText
-    txtGJ.Text = strOtp
-    txtStatus.Text = ""
-    If Len(strCFN) > 0 Then
-        Set objXml = New DOMDocument60
-        Set objXrt = objXml.appendChild(objXml.createElement("Myinfo"))
-        objXrt.appendChild(objXml.createElement("FirstName")).Text = "My First Name"
-        objXrt.appendChild(objXml.createElement("LastName")).Text = "My Last Name"
-        objXrt.appendChild(objXml.createElement("StreetAdd")).Text = "My Address"
-
-        If Len(strCFN) > 0 Then
-            Set objXnd = objXml.selectSingleNode("/Myinfo/FirstName")
-            objXnd.Text = strCFN
+        If Len(customFirstName) > 0 Then
+            Dim xmlNode As IXMLDOMNode
+            Set xmlNode = xmlDocument.selectSingleNode("/Myinfo/FirstName")
+            xmlNode.Text = customFirstName
         End If
     Else
-        Set objXml = New DOMDocument60
-        Set objXrt = objXml.appendChild(objXml.createElement("xml"))
-        'Dim positions As IXMLDOMAttribute
-        'Set positions = objXml.createAttribute("positions")
-        'objXrt.Attributes.setNamedItem positions
-        'Dim attributenames As IXMLDOMAttribute
-        'Set attributenames = objXml.createAttribute("attributenames")
-        'objXrt.Attributes.setNamedItem attributenames
-        'Dim allvalues As IXMLDOMAttribute
-        'Set allvalues = objXml.createAttribute("allvalues")
-        'objXrt.Attributes.setNamedItem allvalues
+        Set xmlDocument = New DOMDocument60
+        Set xmlElement = xmlDocument.appendChild(xmlDocument.createElement("xml"))
+
+        Dim savedQuoteCharacterLocation As Integer
+        Dim lastLoopHadAStartQuote As Boolean
+        Dim lastLoopHadFullAttribute As Boolean
+        Dim attributeName As String
         Do
-            If blnLTWFA Then
-                strSCh = ","
+            Dim searchCharacter As String
+            If lastLoopHadFullAttribute Then
+                searchCharacter = ","
             Else
-                strSCh = """"
+                searchCharacter = """"
             End If
-            intNTQCL = InStr(intQCL + 1, strOtp, strSCh, vbTextCompare)
-            If intNTQCL = 0 And blnLTWFA Then
-                strSCh = "}"
-                intNTQCL = InStr(intQCL + 1, strOtp, strSCh, vbTextCompare)
+            Dim currentQuoteCharacterLocation As Integer
+            currentQuoteCharacterLocation = InStr(savedQuoteCharacterLocation + 1, responseText, searchCharacter, vbTextCompare)
+            If currentQuoteCharacterLocation = 0 And lastLoopHadFullAttribute Then
+                searchCharacter = "}"
+                currentQuoteCharacterLocation = InStr(savedQuoteCharacterLocation + 1, responseText, searchCharacter, vbTextCompare)
             End If
-            If intNTQCL = 0 Then
+            If currentQuoteCharacterLocation = 0 Then
                 Exit Do
             Else
-                'If Len(positions.Text) > 0 Then
-                '    positions.Text = positions.Text + "," + CStr(intNTQCL)
-                'Else
-                '    positions.Text = CStr(intNTQCL)
-                'End If
-
-                If blnLTWFA Then
-                    strCVl = Replace(Replace(Trim(Mid(strOtp, intQCL + 2, intNTQCL - intQCL - 2)), vbCr, ""), vbLf, "")
-                    If Len(strCVl) >= 2 And Left(strCVl, 1) = """" And Right(strCVl, 1) = """" Then
-                        strCVl = Mid(strCVl, 2, Len(strCVl) - 2)
+                If lastLoopHadFullAttribute Then
+                    Dim currentValue As String
+                    currentValue = Replace(Replace(Trim(Mid(responseText, savedQuoteCharacterLocation + 2, currentQuoteCharacterLocation - savedQuoteCharacterLocation - 2)), vbCr, ""), vbLf, "")
+                    If Len(currentValue) >= 2 And Left(currentValue, 1) = """" And Right(currentValue, 1) = """" Then
+                        currentValue = Mid(currentValue, 2, Len(currentValue) - 2)
                     End If
-                    'If Len(allvalues.Text) > 0 Then
-                    '    allvalues.Text = allvalues.Text + "," + strCVl
-                    'Else
-                    '    allvalues.Text = strCVl
-                    'End If
 
-                    objXrt.appendChild(objXml.createElement(strNOA)).Text = strCVl
+                    xmlElement.appendChild(xmlDocument.createElement(attributeName)).Text = currentValue
 
-                    blnLTWFA = False
+                    lastLoopHadFullAttribute = False
                 Else
-                    If blnLTWSQ Then
-                        strNOA = Mid(strOtp, intQCL + 1, intNTQCL - intQCL - 1)
+                    If lastLoopHadAStartQuote Then
+                        attributeName = Mid(responseText, savedQuoteCharacterLocation + 1, currentQuoteCharacterLocation - savedQuoteCharacterLocation - 1)
 
-                        'If Len(attributenames.Text) > 0 Then
-                        '    attributenames.Text = attributenames.Text + "," + strNOA
-                        'Else
-                        '    attributenames.Text = strNOA
-                        'End If
-                        blnLTWSQ = False
-                        blnLTWFA = True
+                        lastLoopHadAStartQuote = False
+                        lastLoopHadFullAttribute = True
                     Else
-                        blnLTWSQ = True
+                        lastLoopHadAStartQuote = True
                     End If
                 End If
             End If
-            intQCL = intNTQCL
+            savedQuoteCharacterLocation = currentQuoteCharacterLocation
         Loop
     End If
 
-    txtGX.Text = objXml.xml
-    txtStatus.Text = objWhr.Status
-    If objWhr.Status <> 201 Then
-        txtStatus.ForeColor = vbRed
+    getOutputXmlTextBox.Text = xmlDocument.xml
+    statusCodeTextBox.Text = httpRequest.Status
+    If httpRequest.Status <> 201 Then
+        statusCodeTextBox.ForeColor = vbRed
     Else
-        txtStatus.ForeColor = vbBlack
+        statusCodeTextBox.ForeColor = vbBlack
     End If
 End Sub
