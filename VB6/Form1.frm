@@ -89,10 +89,10 @@ Begin VB.Form Form1
          BackColor       =   &H8000000F&
          BorderStyle     =   0  'None
          BeginProperty Font 
-            Name            =   "MS Mincho"
-            Size            =   9.75
+            Name            =   "Fixedsys"
+            Size            =   9
             Charset         =   0
-            Weight          =   700
+            Weight          =   400
             Underline       =   0   'False
             Italic          =   0   'False
             Strikethrough   =   0   'False
@@ -227,7 +227,7 @@ Private Sub btnPOST_Click()
     UrlString = "https://jsonplaceholder.typicode.com/posts"
     httpURL.Open "POST", UrlString, False
     httpURL.SetRequestHeader "Content-type", "application/json"
-    
+
     Dim XMLDoc As DOMDocument60
     Dim successfulload As Boolean
     Set XMLDoc = New DOMDocument60
@@ -252,7 +252,7 @@ Private Sub btnPOST_Click()
         txtGX.ForeColor = vbRed
         Exit Sub
     End If
-    
+
     txtPJ.Text = jsonText
     httpURL.Send jsonText
     Output = httpURL.ResponseText
@@ -293,7 +293,7 @@ Private Sub LongMethod(Optional ByVal Customfirstname As String = "")
         XMLRoot.appendChild(XmlContent.createElement("FirstName")).Text = "My First Name"
         XMLRoot.appendChild(XmlContent.createElement("LastName")).Text = "My Last Name"
         XMLRoot.appendChild(XmlContent.createElement("StreetAdd")).Text = "My Address"
-        
+
         If Len(Customfirstname) > 0 Then
             Dim node As IXMLDOMNode
             Set node = XmlContent.selectSingleNode("/Myinfo/FirstName")
@@ -336,7 +336,7 @@ Private Sub LongMethod(Optional ByVal Customfirstname As String = "")
                 'Else
                 '    positions.Text = CStr(newtempquotecharloc)
                 'End If
-                
+
                 If lasttripwasthefullattribute Then
                     Dim currentvalue As String
                     currentvalue = Replace(Replace(Trim(Mid(Output, quotecharloc + 2, newtempquotecharloc - quotecharloc - 2)), vbCr, ""), vbLf, "")
@@ -355,7 +355,7 @@ Private Sub LongMethod(Optional ByVal Customfirstname As String = "")
                 Else
                     If lasttripwasthestartquote Then
                         nameofattribute = Mid(Output, quotecharloc + 1, newtempquotecharloc - quotecharloc - 1)
-                        
+
                         'If Len(attributenames.Text) > 0 Then
                         '    attributenames.Text = attributenames.Text + "," + nameofattribute
                         'Else
@@ -371,7 +371,7 @@ Private Sub LongMethod(Optional ByVal Customfirstname As String = "")
             quotecharloc = newtempquotecharloc
         Loop
     End If
-    
+
     txtGX.Text = XmlContent.xml
     txtStatus.Text = httpURL.Status
     If httpURL.Status <> 201 Then

@@ -1,2 +1,7 @@
-VB6/*.scc
-VB6/*.vbw
+.vs/
+bin/
+obj/
+
+*.scc
+*.user
+*.vbw
