@@ -23,17 +23,11 @@ namespace ClassLibrary
 
         public string CreateXmlWithCustomFirstName(string customFirstName)
         {
-            var xDocument = new XDocument();
-            var xElement = new XElement("Myinfo");
-            xDocument.Add(xElement);
-            xElement.Add(new XElement("FirstName", "My First Name"));
-            xElement.Add(new XElement("LastName", "My Last Name"));
-            xElement.Add(new XElement("StreetAdd", "My Address"));
-
-            if (!string.IsNullOrEmpty(customFirstName))
-            {
-                xDocument.Root.Element("FirstName").Value = customFirstName;
-            }
+            var xDocument = new XDocument(new XElement("Myinfo",
+                new XElement("FirstName", !string.IsNullOrEmpty(customFirstName) ? customFirstName : "My First Name"),
+                new XElement("LastName", "My Last Name"),
+                new XElement("StreetAdd", "My Address")
+            ));
 
             return xDocument.ToString();
         }
