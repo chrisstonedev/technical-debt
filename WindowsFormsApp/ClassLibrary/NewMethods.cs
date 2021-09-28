@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Xml.Linq;
 
 namespace ClassLibrary
 {
@@ -19,9 +21,21 @@ namespace ClassLibrary
             this.model = model;
         }
 
-        public int ReturnFive()
+        public string CreateXmlWithCustomFirstName(string customFirstName)
         {
-            return model.GetFive();
+            var xDocument = new XDocument();
+            var xElement = new XElement("Myinfo");
+            xDocument.Add(xElement);
+            xElement.Add(new XElement("FirstName", "My First Name"));
+            xElement.Add(new XElement("LastName", "My Last Name"));
+            xElement.Add(new XElement("StreetAdd", "My Address"));
+
+            if (!string.IsNullOrEmpty(customFirstName))
+            {
+                xDocument.Root.Element("FirstName").Value = customFirstName;
+            }
+
+            return xDocument.ToString();
         }
     }
 }

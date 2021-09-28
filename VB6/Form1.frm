@@ -255,7 +255,7 @@ Private Sub SendGetRequest(Optional ByVal customFirstName As String = "")
     statusCodeTextBox.Text = ""
     Dim xmlString As String
     If Len(customFirstName) > 0 Then
-        xmlString = CreateXmlWithCustomFirstName(customFirstName)
+        xmlString = OurNewMethods.CreateXmlWithCustomFirstName(customFirstName)
     Else
         xmlString = GenerateXmlFromJson(responseText)
     End If
@@ -268,23 +268,6 @@ Private Sub SendGetRequest(Optional ByVal customFirstName As String = "")
         statusCodeTextBox.ForeColor = vbBlack
     End If
 End Sub
-
-Private Function CreateXmlWithCustomFirstName(ByVal customFirstName As String) As String
-    Dim xmlDocument As DOMDocument60
-    Set xmlDocument = New DOMDocument60
-    Dim xmlElement As IXMLDOMElement
-    Set xmlElement = xmlDocument.appendChild(xmlDocument.createElement("Myinfo"))
-    xmlElement.appendChild(xmlDocument.createElement("FirstName")).Text = "My First Name"
-    xmlElement.appendChild(xmlDocument.createElement("LastName")).Text = "My Last Name"
-    xmlElement.appendChild(xmlDocument.createElement("StreetAdd")).Text = "My Address"
-
-    If Len(customFirstName) > 0 Then
-        Dim xmlNode As IXMLDOMNode
-        Set xmlNode = xmlDocument.selectSingleNode("/Myinfo/FirstName")
-        xmlNode.Text = customFirstName
-    End If
-    CreateXmlWithCustomFirstName = xmlDocument.xml
-End Function
 
 Private Function GenerateXmlFromJson(ByVal json As String) As String
     Dim xmlDocument As DOMDocument60
@@ -335,5 +318,5 @@ Private Function GenerateXmlFromJson(ByVal json As String) As String
         End If
         savedQuoteCharacterLocation = currentQuoteCharacterLocation
     Loop
-    GenerateXmlFromJson xmlDocument.xml
+    GenerateXmlFromJson = xmlDocument.xml
 End Function

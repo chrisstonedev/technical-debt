@@ -1,6 +1,7 @@
 ﻿using ClassLibrary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Xml.Linq;
 
 namespace UnitTestProject
 {
@@ -8,16 +9,35 @@ namespace UnitTestProject
     public class UnitTest
     {
         [TestMethod]
-        public void TestMethod()
+        public void CreateXmlWithActualStringTest()
         {
-            const int expected = 8;
             var model = new Mock<IModel>();
-            model.Setup(x => x.GetFive()).Returns(expected);
             var newMethods = new NewMethods(model.Object);
 
-            var result = newMethods.ReturnFive();
+            var result = newMethods.CreateXmlWithCustomFirstName("Chris");
 
-            Assert.AreEqual(expected, result);
+            var xml = XDocument.Parse(result);
+             
+            Assert.AreEqual("Myinfo", xml.Root.Name);
+            Assert.AreEqual("Chris", xml.Root.Element("FirstName").Value);
+            Assert.AreEqual("My Last Name", xml.Root.Element("LastName").Value);
+            Assert.AreEqual("My Address", xml.Root.Element("StreetAdd").Value);
+        }
+
+        [TestMethod]
+        public void CreateXmlWithNullStringTest()
+        {
+            var model = new Mock<IModel>();
+            var newMethods = new NewMethods(model.Object);
+
+            var result = newMethods.CreateXmlWithCustomFirstName(null);
+
+            var xml = XDocument.Parse(result);
+             
+            Assert.AreEqual("Myinfo", xml.Root.Name);
+            Assert.AreEqual("My First Name", xml.Root.Element("FirstName").Value);
+            Assert.AreEqual("My Last Name", xml.Root.Element("LastName").Value);
+            Assert.AreEqual("My Address", xml.Root.Element("StreetAdd").Value);
         }
     }
 }
