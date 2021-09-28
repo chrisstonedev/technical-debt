@@ -14,7 +14,7 @@ Begin VB.Form Form1
       Height          =   1455
       Left            =   4800
       MultiLine       =   -1  'True
-      TabIndex        =   14
+      TabIndex        =   11
       Top             =   4440
       Width           =   4095
    End
@@ -23,32 +23,24 @@ Begin VB.Form Form1
       Height          =   1455
       Left            =   120
       MultiLine       =   -1  'True
-      TabIndex        =   13
+      TabIndex        =   10
       Top             =   4440
       Width           =   4335
-   End
-   Begin VB.CommandButton getAltButton 
-      Caption         =   "GET alt"
-      Height          =   735
-      Left            =   7560
-      TabIndex        =   8
-      Top             =   720
-      Width           =   1095
    End
    Begin VB.TextBox getOutputXmlTextBox 
       Enabled         =   0   'False
       Height          =   1455
       Left            =   4800
       MultiLine       =   -1  'True
-      TabIndex        =   6
-      Top             =   2520
+      TabIndex        =   4
+      Top             =   2640
       Width           =   4095
    End
    Begin VB.TextBox statusCodeTextBox 
       Enabled         =   0   'False
       Height          =   285
       Left            =   7200
-      TabIndex        =   5
+      TabIndex        =   3
       Top             =   90
       Width           =   1335
    End
@@ -57,25 +49,9 @@ Begin VB.Form Form1
       Height          =   1455
       Left            =   120
       MultiLine       =   -1  'True
-      TabIndex        =   4
-      Top             =   2520
-      Width           =   4335
-   End
-   Begin VB.CommandButton postButton 
-      Caption         =   "POST"
-      Height          =   495
-      Left            =   5880
-      TabIndex        =   3
-      Top             =   1560
-      Width           =   2775
-   End
-   Begin VB.CommandButton getMainButton 
-      Caption         =   "GET main"
-      Height          =   735
-      Left            =   5880
       TabIndex        =   2
-      Top             =   720
-      Width           =   1455
+      Top             =   2640
+      Width           =   4335
    End
    Begin VB.Frame userIdFrame 
       Caption         =   "User ID"
@@ -100,7 +76,7 @@ Begin VB.Form Form1
          ForeColor       =   &H00C000C0&
          Height          =   285
          Left            =   60
-         TabIndex        =   7
+         TabIndex        =   5
          Text            =   "First Name"
          Top             =   180
          Width           =   2415
@@ -129,7 +105,7 @@ Begin VB.Form Form1
          ForeColor       =   &H00C000C0&
          Height          =   285
          Left            =   60
-         TabIndex        =   16
+         TabIndex        =   13
          Text            =   "0"
          Top             =   180
          Width           =   900
@@ -139,7 +115,7 @@ Begin VB.Form Form1
       Caption         =   "Status Code:"
       Height          =   375
       Left            =   5880
-      TabIndex        =   15
+      TabIndex        =   12
       Top             =   120
       Width           =   3015
    End
@@ -147,7 +123,7 @@ Begin VB.Form Form1
       Caption         =   "POST Output in JSON"
       Height          =   375
       Left            =   4800
-      TabIndex        =   12
+      TabIndex        =   9
       Top             =   4200
       Width           =   3015
    End
@@ -155,15 +131,15 @@ Begin VB.Form Form1
       Caption         =   "GET Output in XML"
       Height          =   375
       Left            =   4800
-      TabIndex        =   11
-      Top             =   2280
+      TabIndex        =   8
+      Top             =   2400
       Width           =   3015
    End
    Begin VB.Label Label2 
       Caption         =   "POST Translate in JSON"
       Height          =   375
       Left            =   120
-      TabIndex        =   10
+      TabIndex        =   7
       Top             =   4200
       Width           =   3015
    End
@@ -171,8 +147,8 @@ Begin VB.Form Form1
       Caption         =   "GET Output in JSON"
       Height          =   375
       Left            =   120
-      TabIndex        =   9
-      Top             =   2280
+      TabIndex        =   6
+      Top             =   2400
       Width           =   3015
    End
 End
@@ -184,8 +160,21 @@ Attribute VB_Exposed = False
 Option Explicit
 Private OurNewMethods As ClassLibrary.NewMethods
 
+Dim WithEvents buttonUserControl As VBControlExtender
+Attribute buttonUserControl.VB_VarHelpID = -1
+
+Private Sub buttonUserControl_ObjectEvent(Info As EventInfo)
+    Debug.Print Info
+End Sub
+
 Private Sub Form_Initialize()
     Set OurNewMethods = New ClassLibrary.NewMethods
+
+    Set buttonUserControl = Controls.Add("ClassLibrary.ButtonUserControl", "ButtonUserControl")
+    'Set ctlEvents = buttonUserControl.object
+    buttonUserControl.Visible = True
+    buttonUserControl.Top = 720
+    buttonUserControl.Left = 5880
 End Sub
 
 Private Sub getMainButton_Click()
