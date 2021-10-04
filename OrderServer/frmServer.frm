@@ -13,28 +13,11 @@ Begin VB.Form frmServer
    ScaleHeight     =   4200
    ScaleWidth      =   7050
    StartUpPosition =   3  'Windows Default
-   Begin VB.CommandButton cmdSend 
-      Caption         =   "&Send"
-      Default         =   -1  'True
-      Height          =   315
-      Left            =   5880
-      TabIndex        =   3
-      Top             =   3840
-      Width           =   975
-   End
-   Begin VB.TextBox txtData 
-      Height          =   285
-      Left            =   120
-      MaxLength       =   100
-      TabIndex        =   2
-      Top             =   3840
-      Width           =   5655
-   End
    Begin VB.TextBox txtMain 
       Height          =   1935
       Left            =   360
       MultiLine       =   -1  'True
-      TabIndex        =   5
+      TabIndex        =   3
       Top             =   1200
       Width           =   2895
    End
@@ -49,7 +32,7 @@ Begin VB.Form frmServer
       Alignment       =   2  'Center
       Height          =   255
       Left            =   2040
-      TabIndex        =   6
+      TabIndex        =   4
       Top             =   840
       Width           =   2175
    End
@@ -57,7 +40,7 @@ Begin VB.Form frmServer
       Caption         =   "Status: Waiting for connection..."
       Height          =   375
       Left            =   600
-      TabIndex        =   4
+      TabIndex        =   2
       Top             =   240
       Width           =   4575
    End
@@ -91,16 +74,10 @@ Private Sub Form_Load()
     objWinsock.Close
     objWinsock.LocalPort = CLng(187)
     objWinsock.Listen
-    lblServerNickname.Caption = "Place an order"
+    lblServerNickname.Caption = "IAmServer"
 End Sub
 
-'Private Sub Form_Unload(Cancel As Integer)
-'    objWinsock.Close
-'End Sub
-
 Private Sub objWinsock_Close()
-    txtMain.SelText = "Disconnected from Client"
-    cmdSend.Enabled = False
     txtStatus.Caption = "Status: Disconnected from client"
 
     objWinsock.Close
@@ -115,26 +92,29 @@ Private Sub objWinsock_ConnectionRequest(ByVal requestID As Long)
     objWinsock.Accept requestID
     txtStatus.Caption = "Status: Connected to client"
     objWinsock.SendData "C" & lblServerNickname.Caption
-    frmServer.Caption = "Chat Server   [Welcome, " & lblServerNickname.Caption & "!]"
-    txtMain.SelText = "Connected to Client"
 End Sub
 
 Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
-    Dim strData, strData2 As String
+    Dim strData, strData2, strData3 As String
     Call objWinsock.GetData(strData, vbString)
     strData2 = Left(strData, 1)
     strData = Mid(strData, 2)
-    If strData2 = "T" Then
-        txtMain.SelText = lblClientNickname.Caption & ":     " & strData & vbCrLf
-    End If
-    If strData2 = "N" Then
-        lblClientNickname.Caption = strData
-    End If
-End Sub
-
-Private Sub cmdSend_Click()
-    txtMain.SelText = lblServerNickname.Caption & ":     " & txtData.Text & vbCrLf
-    objWinsock.SendData "T" & txtData.Text
-    txtData.Text = ""
+    Select Case strData2
+        Case "T" 'New text data
+            strData3 = Left(strData, 1)
+            strData = Mid(strData, 2)
+            Select Case strData3
+                Case "C"
+                    txtMain.SelText = "Customer ID:     " & strData & vbCrLf
+                    objWinsock.SendData "ROEnter product ID"
+                Case "O"
+                    txtMain.SelText = "Product ID:     " & strData & vbCrLf
+                    objWinsock.SendData "F"
+            End Select
+        Case "N" 'New connection
+            lblClientNickname.Caption = strData
+        Case "S" 'Start request
+            objWinsock.SendData "RCEnter customer ID"
+    End Select
 End Sub
 

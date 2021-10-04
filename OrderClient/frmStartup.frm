@@ -17,7 +17,7 @@ Begin VB.Form frmStartup
       Left            =   120
       MaxLength       =   20
       TabIndex        =   3
-      Text            =   "NickName here"
+      Text            =   "IAmClient"
       Top             =   1200
       Width           =   2175
    End
