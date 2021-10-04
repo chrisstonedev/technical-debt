@@ -62,8 +62,13 @@ Option Explicit
 
 Private Sub Form_Load()
     lblYourIP.Caption = "Your IP:  " & objWinsock.LocalIP
-    txtIP.Text = "Server's IP here"
+    txtIP.Text = objWinsock.LocalIP
 End Sub
+
+'Private Sub Form_Unload(Cancel As Integer)
+'    frmClient.objWinsock.Close
+'    Unload frmClient
+'End Sub
 
 Private Sub cmdConnect_Click()
     If txtNickname.Text = "" Then
@@ -79,4 +84,3 @@ Private Sub cmdConnect_Click()
     frmClient.objWinsock.Connect txtIP.Text, "187"
     frmClient.lblClientNickname.Caption = txtNickname.Text
 End Sub
-

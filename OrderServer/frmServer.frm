@@ -18,7 +18,7 @@ Begin VB.Form frmServer
       Default         =   -1  'True
       Height          =   315
       Left            =   5880
-      TabIndex        =   4
+      TabIndex        =   3
       Top             =   3840
       Width           =   975
    End
@@ -26,20 +26,17 @@ Begin VB.Form frmServer
       Height          =   285
       Left            =   120
       MaxLength       =   100
-      TabIndex        =   3
+      TabIndex        =   2
       Top             =   3840
       Width           =   5655
    End
    Begin VB.TextBox txtMain 
-      BackColor       =   &H00FFFFFF&
-      Height          =   3615
-      Left            =   120
-      Locked          =   -1  'True
+      Height          =   1935
+      Left            =   360
       MultiLine       =   -1  'True
-      ScrollBars      =   2  'Vertical
-      TabIndex        =   0
-      Top             =   120
-      Width           =   6855
+      TabIndex        =   5
+      Top             =   1200
+      Width           =   2895
    End
    Begin MSWinsockLib.Winsock objWinsock 
       Left            =   120
@@ -48,10 +45,26 @@ Begin VB.Form frmServer
       _ExtentY        =   741
       _Version        =   393216
    End
+   Begin VB.Label lblYourIP 
+      Alignment       =   2  'Center
+      Height          =   255
+      Left            =   2040
+      TabIndex        =   6
+      Top             =   840
+      Width           =   2175
+   End
+   Begin VB.Label txtStatus 
+      Caption         =   "Status: Waiting for connection..."
+      Height          =   375
+      Left            =   600
+      TabIndex        =   4
+      Top             =   240
+      Width           =   4575
+   End
    Begin VB.Label lblClientNickname 
       Height          =   135
       Left            =   480
-      TabIndex        =   2
+      TabIndex        =   1
       Top             =   4320
       Visible         =   0   'False
       Width           =   255
@@ -59,7 +72,7 @@ Begin VB.Form frmServer
    Begin VB.Label lblServerNickname 
       Height          =   135
       Left            =   240
-      TabIndex        =   1
+      TabIndex        =   0
       Top             =   4320
       Visible         =   0   'False
       Width           =   255
@@ -72,9 +85,27 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+Private Sub Form_Load()
+    lblYourIP.Caption = "Your IP:  " & objWinsock.LocalIP
+
+    objWinsock.Close
+    objWinsock.LocalPort = CLng(187)
+    objWinsock.Listen
+    lblServerNickname.Caption = "Place an order"
+End Sub
+
+'Private Sub Form_Unload(Cancel As Integer)
+'    objWinsock.Close
+'End Sub
+
 Private Sub objWinsock_Close()
     txtMain.SelText = "Disconnected from Client"
     cmdSend.Enabled = False
+    txtStatus.Caption = "Status: Disconnected from client"
+
+    objWinsock.Close
+    objWinsock.LocalPort = CLng(187)
+    objWinsock.Listen
 End Sub
 
 Private Sub objWinsock_ConnectionRequest(ByVal requestID As Long)
@@ -82,8 +113,7 @@ Private Sub objWinsock_ConnectionRequest(ByVal requestID As Long)
         objWinsock.Close
     End If
     objWinsock.Accept requestID
-    Me.Show
-    Unload frmStartup
+    txtStatus.Caption = "Status: Connected to client"
     objWinsock.SendData "C" & lblServerNickname.Caption
     frmServer.Caption = "Chat Server   [Welcome, " & lblServerNickname.Caption & "!]"
     txtMain.SelText = "Connected to Client"
@@ -107,3 +137,4 @@ Private Sub cmdSend_Click()
     objWinsock.SendData "T" & txtData.Text
     txtData.Text = ""
 End Sub
+
