@@ -14,7 +14,6 @@ Begin VB.Form frmClient
    ScaleWidth      =   7050
    Begin VB.CommandButton cmdStart 
       Caption         =   "S&tart"
-      Default         =   -1  'True
       Height          =   315
       Left            =   1560
       TabIndex        =   5
@@ -31,6 +30,7 @@ Begin VB.Form frmClient
    End
    Begin VB.CommandButton cmdSend 
       Caption         =   "&Send"
+      Default         =   -1  'True
       Height          =   315
       Left            =   5880
       TabIndex        =   0
@@ -43,6 +43,23 @@ Begin VB.Form frmClient
       _ExtentX        =   741
       _ExtentY        =   741
       _Version        =   393216
+   End
+   Begin VB.Label lblError 
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H000000FF&
+      Height          =   375
+      Left            =   600
+      TabIndex        =   7
+      Top             =   2760
+      Width           =   4575
    End
    Begin VB.Label lblQuestion 
       Caption         =   "Click to Start!"
@@ -114,7 +131,7 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
     strData2 = Left(strData, 1)
     strData = Mid(strData, 2)
     Select Case strData2
-        Case "C"
+        Case "C" 'Connection request
             lblServerNickname.Caption = strData
             Me.Show
             Unload frmStartup
@@ -125,23 +142,35 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
             cmdStart.Enabled = True
             txtData.Visible = False
             cmdSend.Visible = False
-        Case "R"
+        Case "R" 'Request for more data
             strData3 = Left(strData, 1)
             strData = Mid(strData, 2)
-            lblQuestion.Caption = strData
             Question = strData3
-            txtData.Visible = True
-            cmdSend.Visible = True
+            lblQuestion.Caption = strData
+            lblError.Caption = ""
             cmdStart.Visible = False
-        Case "F"
+            txtData.Visible = True
+            txtData.Enabled = True
+            txtData.Text = ""
+            cmdSend.Visible = True
+            cmdSend.Enabled = True
+        Case "F" 'Finished order
             lblQuestion.Caption = "Order has been complete!"
+            lblError.Caption = ""
+            cmdStart.Visible = True
             txtData.Visible = False
             cmdSend.Visible = False
-            cmdStart.Visible = True
+        Case "E" 'Error on input
+            lblError.Caption = strData
+            txtData.Enabled = True
+            txtData.SelStart = 0
+            txtData.SelLength = Len(txtData.Text)
+            cmdSend.Enabled = True
     End Select
 End Sub
 
 Private Sub cmdSend_Click()
     objWinsock.SendData "T" & Question & txtData.Text
-    txtData.Text = ""
+    txtData.Enabled = False
+    cmdSend.Enabled = False
 End Sub

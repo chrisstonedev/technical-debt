@@ -105,8 +105,13 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
             strData = Mid(strData, 2)
             Select Case strData3
                 Case "C"
-                    txtMain.SelText = "Customer ID:     " & strData & vbCrLf
-                    objWinsock.SendData "ROEnter product ID"
+                    If IsNumeric(strData) Then
+                        txtMain.SelText = "Customer ID:     " & strData & vbCrLf
+                        objWinsock.SendData "ROEnter product ID"
+                    Else
+                        txtMain.SelText = "Customer ID (ERROR):     " & strData & vbCrLf
+                        objWinsock.SendData "ECustomer ID could not be found"
+                    End If
                 Case "O"
                     txtMain.SelText = "Product ID:     " & strData & vbCrLf
                     objWinsock.SendData "F"
