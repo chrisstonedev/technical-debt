@@ -114,12 +114,52 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
                     End If
                 Case "O"
                     txtMain.SelText = "Product ID:     " & strData & vbCrLf
-                    objWinsock.SendData "F"
+                    objWinsock.SendData "R"
             End Select
         Case "N" 'New connection
             lblClientNickname.Caption = strData
         Case "S" 'Start request
             objWinsock.SendData "RCEnter customer ID"
+        Case "F" 'Finish request
+            Dim objDocument As DOMDocument60
+            Dim blnSuccess As Boolean
+            Set objDocument = New DOMDocument60
+            blnSuccess = objDocument.loadXML(strData)
+            If blnSuccess Then
+                Dim objNode As IXMLDOMNode
+                Dim objNodeList As IXMLDOMNodeList
+                Set objNodeList = objDocument.selectNodes("/xml/*")
+                Dim strJson As String
+                Dim objFieldsToSave As Collection
+                Dim objResponse As clsResponse
+                Set objFieldsToSave = New Collection
+                For Each objNode In objNodeList
+                    Set objResponse = New clsResponse
+                    objResponse.FieldID = objNode.Attributes.getNamedItem("id").Text
+                    objResponse.UserResponse = objNode.Text
+                    objFieldsToSave.Add objResponse
+                Next objNode
+                For Each objResponse In objFieldsToSave
+                    txtMain.SelText = "Client wants to use data """ & objResponse.UserResponse & """ for field of id """ & objResponse.FieldID & """" & vbCrLf
+                Next objResponse
+                'TODO: Attempt to save to database.
+                objWinsock.SendData "F"
+            Else
+                txtMain.SelText = "Customer ID (ERROR):     " & strData & vbCrLf
+                objWinsock.SendData "ECould not read data from client"
+            End If
+
+            'Set xmlDocument = New DOMDocument60
+            'Set xmlElement = xmlDocument.appendChild(xmlDocument.createElement("Myinfo"))
+            'xmlElement.appendChild(xmlDocument.createElement("FirstName")).Text = "My First Name"
+            'xmlElement.appendChild(xmlDocument.createElement("LastName")).Text = "My Last Name"
+            'xmlElement.appendChild(xmlDocument.createElement("StreetAdd")).Text = "My Address"
+
+            'If Len(customFirstName) > 0 Then
+            '    Dim xmlNode As IXMLDOMNode
+            '    Set xmlNode = xmlDocument.selectSingleNode("/Myinfo/FirstName")
+            '    xmlNode.Text = customFirstName
+            'End If
     End Select
 End Sub
 
