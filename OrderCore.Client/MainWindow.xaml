@@ -3,10 +3,38 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:OrderCore.Client"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Order Client" Height="488" Width="596"
+        Loaded="Window_Loaded"
+        Unloaded="Window_Unloaded">
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Label Name="StatusLabel">Status: Waiting for connection...</Label>
+        <Border Grid.Row="1" BorderBrush="Black" BorderThickness="2" Margin="50 20">
+            <Grid Background="AliceBlue">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label Name="QuestionLabel" FontSize="24" HorizontalAlignment="Center">Waiting for connection...</Label>
+                <Label Name="ErrorLabel" Grid.Row="1" FontSize="24" Foreground="Red" HorizontalAlignment="Center"></Label>
+            </Grid>
+        </Border>
+        <Button Name="StartButton" Grid.Row="2" Margin="150 20" FontSize="24" Click="StartButton_Click">S_tart</Button>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Name="CancelButton" Margin="10" Padding="10" IsCancel="True" Click="CancelButton_Click">_Cancel</Button>
+            <TextBox Name="DataTextBox" Grid.Column="1" Margin="10"></TextBox>
+            <Button Name="SendButton" Grid.Column="2" Margin="10" Padding="10" IsDefault="True" Click="SendButton_Click">_Send</Button>
+        </Grid>
     </Grid>
 </Window>

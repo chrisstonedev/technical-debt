@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -43,10 +44,8 @@ namespace UiTestRunner
             {
                 try
                 {
-                    var result = method.Invoke(null, null) as Task;
-                    await result;
-                    //await OrderClientTests.SuccessfulOrderTest();
-                    SetTestStatus(method.Name, true, DateTime.Now.ToString());
+                    await (method.Invoke(null, null) as Task);
+                    SetTestStatus(method.Name, true, DateTime.Now.ToString(new CultureInfo("en-US")));
                 }
                 catch (Exception ex)
                 {
@@ -57,17 +56,17 @@ namespace UiTestRunner
 
         private void SetTestStatus(string testName, bool wasSuccessful, string data)
         {
-            string status = wasSuccessful ? "Success" : "Failed";
+            var status = wasSuccessful ? "Success" : "Failed";
             foreach (DataGridViewRow row in testResultsDataGridView.Rows)
             {
-                if (row.Cells[0].Value.ToString().Equals(testName))
+                if (row.Cells[0].Value.ToString().Equals(testName, StringComparison.Ordinal))
                 {
                     row.Cells[1].Value = status;
                     row.Cells[2].Value = data;
                     return;
                 }
             }
-            testResultsDataGridView.Rows.Add(testName, status, data);
+            _ = testResultsDataGridView.Rows.Add(testName, status, data);
         }
 
         private void CloseProgramButton_Click(object sender, EventArgs e)
@@ -79,14 +78,15 @@ namespace UiTestRunner
         {
             try
             {
-                TestClass.GetWindowHandle(windowTitleTextBox.Text);
-                MessageBox.Show("The program is open! Tests are ready to run.", "TestWinAPI", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                _ = TestClass.GetWindowHandle(windowTitleTextBox.Text);
+                _ = MessageBox.Show("The program is open! Tests are ready to run.", "TestWinAPI", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (AssertException)
             {
                 if (MessageBox.Show("Couldn't find the program. Do you want to start it?", "TestWinAPI", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
-                    Process.Start(@"..\..\..\..\OrderClient\OrderClient.exe");
+                    var process = Process.Start(@"..\..\..\..\OrderCore.Client\bin\Debug\net5.0-windows\OrderCore.Client.exe");
+                    windowControlTextBox.Text = ((int)process.Handle).ToString(new CultureInfo("en-US"));
                 }
             }
         }
@@ -97,19 +97,19 @@ namespace UiTestRunner
 
             try
             {
-                int hwnd;
-                if (windowControlTextBox.TextLength > 0)
-                    hwnd = int.Parse(windowControlTextBox.Text);
-                else
-                    hwnd = TestClass.GetWindowHandle(windowTitleTextBox.Text);
+                var hwnd = windowControlTextBox.TextLength > 0
+                    ? int.Parse(windowControlTextBox.Text, new CultureInfo("en-US"))
+                    : TestClass.GetWindowHandle(windowTitleTextBox.Text);
                 var children = LegacyMethods.ListAllChildren((IntPtr)hwnd);
 
                 foreach (var something in children)
-                    dataGridView.Rows.Add(something.WindowHandle, something.ClassName, something.Parent);
+                {
+                    _ = dataGridView.Rows.Add(something.WindowHandle, something.ClassName, something.Parent);
+                }
             }
             catch (AssertException)
             {
-                MessageBox.Show("Couldn't find the program.", "TestWinAPI", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show("Couldn't find the program.", "TestWinAPI", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
         }
