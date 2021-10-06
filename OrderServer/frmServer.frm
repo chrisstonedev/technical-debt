@@ -96,9 +96,18 @@ End Sub
 
 Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
     Dim strData, strData2, strData3 As String
+    Dim objDocument As DOMDocument60
+    Dim blnSuccess As Boolean
+    Dim objNode As IXMLDOMNode
+    Dim objNodeList As IXMLDOMNodeList
+    Dim strJson As String
+    Dim objFieldsToSave As Collection
+    Dim objResponse As clsResponse
+
     Call objWinsock.GetData(strData, vbString)
     strData2 = Left(strData, 1)
     strData = Mid(strData, 2)
+    Dim strTemp As String
     Select Case strData2
         Case "T" 'New text data
             strData3 = Left(strData, 1)
@@ -113,25 +122,28 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
                         objWinsock.SendData "ECustomer ID could not be found"
                     End If
                 Case "O"
-                    txtMain.SelText = "Product ID:     " & strData & vbCrLf
-                    objWinsock.SendData "R"
+                    If Len(strData) > 2 Then
+                        If Len(strData) <= 10 Then
+                            txtMain.SelText = "Product ID:     " & strData & vbCrLf
+                            objWinsock.SendData "R"
+                        Else
+                            txtMain.SelText = "Product ID (ERROR):     " & strData & vbCrLf
+                            objWinsock.SendData "EProduct ID is too long"
+                        End If
+                    Else
+                        txtMain.SelText = "Product ID (ERROR):     " & strData & vbCrLf
+                        objWinsock.SendData "EProduct ID is not long enough"
+                    End If
             End Select
         Case "N" 'New connection
             lblClientNickname.Caption = strData
         Case "S" 'Start request
-            objWinsock.SendData "RCEnter customer ID"
+            objWinsock.SendData "RCEnter customer ID" & strTemp
         Case "F" 'Finish request
-            Dim objDocument As DOMDocument60
-            Dim blnSuccess As Boolean
             Set objDocument = New DOMDocument60
             blnSuccess = objDocument.loadXML(strData)
             If blnSuccess Then
-                Dim objNode As IXMLDOMNode
-                Dim objNodeList As IXMLDOMNodeList
                 Set objNodeList = objDocument.selectNodes("/xml/*")
-                Dim strJson As String
-                Dim objFieldsToSave As Collection
-                Dim objResponse As clsResponse
                 Set objFieldsToSave = New Collection
                 For Each objNode In objNodeList
                     Set objResponse = New clsResponse
@@ -148,18 +160,6 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
                 txtMain.SelText = "Customer ID (ERROR):     " & strData & vbCrLf
                 objWinsock.SendData "ECould not read data from client"
             End If
-
-            'Set xmlDocument = New DOMDocument60
-            'Set xmlElement = xmlDocument.appendChild(xmlDocument.createElement("Myinfo"))
-            'xmlElement.appendChild(xmlDocument.createElement("FirstName")).Text = "My First Name"
-            'xmlElement.appendChild(xmlDocument.createElement("LastName")).Text = "My Last Name"
-            'xmlElement.appendChild(xmlDocument.createElement("StreetAdd")).Text = "My Address"
-
-            'If Len(customFirstName) > 0 Then
-            '    Dim xmlNode As IXMLDOMNode
-            '    Set xmlNode = xmlDocument.selectSingleNode("/Myinfo/FirstName")
-            '    xmlNode.Text = customFirstName
-            'End If
     End Select
 End Sub
 

@@ -29,7 +29,6 @@ Begin VB.Form frmClient
       Width           =   5895
       Begin VB.Label lblError 
          Alignment       =   2  'Center
-         Caption         =   "Error"
          BeginProperty Font 
             Name            =   "MS Sans Serif"
             Size            =   9.75
@@ -48,7 +47,7 @@ Begin VB.Form frmClient
       End
       Begin VB.Label lblQuestion 
          Alignment       =   2  'Center
-         Caption         =   "Click to Start!"
+         Caption         =   "Waiting for connection..."
          BeginProperty Font 
             Name            =   "MS Sans Serif"
             Size            =   9.75
@@ -67,6 +66,7 @@ Begin VB.Form frmClient
    End
    Begin VB.CommandButton cmdStart 
       Caption         =   "S&tart"
+      Enabled         =   0   'False
       BeginProperty Font 
          Name            =   "MS Sans Serif"
          Size            =   13.5
@@ -115,6 +115,7 @@ Begin VB.Form frmClient
       Width           =   4575
    End
    Begin VB.Label lblClientNickname 
+      Caption         =   "Client1"
       Height          =   135
       Left            =   360
       TabIndex        =   9
@@ -180,8 +181,7 @@ Private Sub cmdStart_Click()
 End Sub
 
 Private Sub Form_Load()
-    lblQuestion = "Click Start to begin!"
-    lblError = ""
+    objWinsock.Connect objWinsock.LocalIP, "187"
 End Sub
 
 Private Sub objWinsock_Close()
@@ -203,8 +203,6 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
     Select Case strData2
         Case "C" 'Connection request
             lblServerNickname.Caption = strData
-            Me.Show
-            Unload frmStartup
             objWinsock.SendData "N" & lblClientNickname.Caption
             txtStatus.Caption = "Status: Connected to Server"
             lblQuestion = "Click to Start!"
@@ -232,6 +230,7 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
                 txtData.Visible = True
                 txtData.Enabled = True
                 txtData.Text = ""
+                txtData.SetFocus
                 cmdSend.Visible = True
                 cmdSend.Enabled = True
                 cmdSend.Caption = "&Send"
@@ -250,6 +249,7 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
                 cmdSend.Visible = True
                 cmdSend.Enabled = True
                 cmdSend.Caption = "&Submit"
+                cmdSend.SetFocus
             End If
         Case "F" 'Finished order
             lblQuestion.Caption = "Order has been complete!"
@@ -261,9 +261,14 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
         Case "E" 'Error on input
             lblError.Caption = strData
             cmdCancel.Enabled = True
-            txtData.Enabled = True
-            txtData.SelStart = 0
-            txtData.SelLength = Len(txtData.Text)
             cmdSend.Enabled = True
+            If txtData.Visible Then
+                txtData.Enabled = True
+                txtData.SelStart = 0
+                txtData.SelLength = Len(txtData.Text)
+                txtData.SetFocus
+            Else
+                cmdSend.SetFocus
+            End If
     End Select
 End Sub
