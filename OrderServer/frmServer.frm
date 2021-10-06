@@ -17,7 +17,7 @@ Begin VB.Form frmServer
       Height          =   1935
       Left            =   360
       MultiLine       =   -1  'True
-      TabIndex        =   3
+      TabIndex        =   1
       Top             =   1200
       Width           =   2895
    End
@@ -32,7 +32,7 @@ Begin VB.Form frmServer
       Alignment       =   2  'Center
       Height          =   255
       Left            =   2040
-      TabIndex        =   4
+      TabIndex        =   2
       Top             =   840
       Width           =   2175
    End
@@ -40,25 +40,9 @@ Begin VB.Form frmServer
       Caption         =   "Status: Waiting for connection..."
       Height          =   375
       Left            =   600
-      TabIndex        =   2
+      TabIndex        =   0
       Top             =   240
       Width           =   4575
-   End
-   Begin VB.Label lblClientNickname 
-      Height          =   135
-      Left            =   480
-      TabIndex        =   1
-      Top             =   4320
-      Visible         =   0   'False
-      Width           =   255
-   End
-   Begin VB.Label lblServerNickname 
-      Height          =   135
-      Left            =   240
-      TabIndex        =   0
-      Top             =   4320
-      Visible         =   0   'False
-      Width           =   255
    End
 End
 Attribute VB_Name = "frmServer"
@@ -74,7 +58,6 @@ Private Sub Form_Load()
     objWinsock.Close
     objWinsock.LocalPort = CLng(187)
     objWinsock.Listen
-    lblServerNickname.Caption = "IAmServer"
 End Sub
 
 Private Sub objWinsock_Close()
@@ -91,7 +74,7 @@ Private Sub objWinsock_ConnectionRequest(ByVal requestID As Long)
     End If
     objWinsock.Accept requestID
     txtStatus.Caption = "Status: Connected to client"
-    objWinsock.SendData "C" & lblServerNickname.Caption
+    objWinsock.SendData "C"
 End Sub
 
 Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
@@ -135,8 +118,6 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
                         objWinsock.SendData "EProduct ID is not long enough"
                     End If
             End Select
-        Case "N" 'New connection
-            lblClientNickname.Caption = strData
         Case "S" 'Start request
             objWinsock.SendData "RCEnter customer ID" & strTemp
         Case "F" 'Finish request

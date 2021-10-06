@@ -114,15 +114,6 @@ Begin VB.Form frmClient
       Top             =   0
       Width           =   4575
    End
-   Begin VB.Label lblClientNickname 
-      Caption         =   "Client1"
-      Height          =   135
-      Left            =   360
-      TabIndex        =   9
-      Top             =   4320
-      Visible         =   0   'False
-      Width           =   255
-   End
    Begin VB.Label lblServerNickname 
       Height          =   135
       Left            =   120
@@ -202,8 +193,6 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
     strData = Mid(strData, 2)
     Select Case strData2
         Case "C" 'Connection request
-            lblServerNickname.Caption = strData
-            objWinsock.SendData "N" & lblClientNickname.Caption
             txtStatus.Caption = "Status: Connected to Server"
             lblQuestion = "Click to Start!"
             cmdStart.Visible = True
