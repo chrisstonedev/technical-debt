@@ -26,47 +26,40 @@ namespace UiTestRunner
                 .Where(t => t.Namespace.EndsWith(".Tests", StringComparison.Ordinal))
                 .ToArray();
 
-            var list = new List<MethodInfo>();
-
             foreach (var type in classes)
             {
-                var methods = type.GetMethods();
-                foreach (var method in methods)
+                foreach (var method in type.GetMethods())
                 {
                     if (method.GetCustomAttribute(typeof(TestRunAttribute), false) != null)
                     {
-                        list.Add(method);
+                        try
+                        {
+                            await (method.Invoke(null, null) as Task);
+                            SetTestStatus(type.Name, method.Name, true, DateTime.Now.ToString(new CultureInfo("en-US")));
+                        }
+                        catch (Exception ex)
+                        {
+                            SetTestStatus(type.Name, method.Name, false, ex.ToString());
+                        }
                     }
-                }
-            }
-
-            foreach (var method in list)
-            {
-                try
-                {
-                    await (method.Invoke(null, null) as Task);
-                    SetTestStatus(method.Name, true, DateTime.Now.ToString(new CultureInfo("en-US")));
-                }
-                catch (Exception ex)
-                {
-                    SetTestStatus(method.Name, false, ex.ToString());
                 }
             }
         }
 
-        private void SetTestStatus(string testName, bool wasSuccessful, string data)
+        private void SetTestStatus(string className, string testName, bool wasSuccessful, string data)
         {
             var status = wasSuccessful ? "Success" : "Failed";
             foreach (DataGridViewRow row in testResultsDataGridView.Rows)
             {
-                if (row.Cells[0].Value.ToString().Equals(testName, StringComparison.Ordinal))
+                if (row.Cells[0].Value.ToString().Equals(className, StringComparison.Ordinal)
+                    && row.Cells[1].Value.ToString().Equals(testName, StringComparison.Ordinal))
                 {
-                    row.Cells[1].Value = status;
-                    row.Cells[2].Value = data;
+                    row.Cells[2].Value = status;
+                    row.Cells[3].Value = data;
                     return;
                 }
             }
-            _ = testResultsDataGridView.Rows.Add(testName, status, data);
+            _ = testResultsDataGridView.Rows.Add(className, testName, status, data);
         }
 
         private void CloseProgramButton_Click(object sender, EventArgs e)

@@ -113,13 +113,13 @@ namespace UiTestRunner.TestFramework
             return hwnd;
         }
 
-        public static void AssertThatWindowMatchesExpectedState(int window, string testName, string stepName)
+        public static void AssertThatWindowMatchesExpectedState(int window, string className, string testName, string stepName)
         {
             var bitmap = GetWindowBitmap(window);
 
-            const string FILE_PATH_FORMAT = @"..\..\..\Tests\{0}_{1}_{2}.bmp";
-            string actualPath = string.Format(FILE_PATH_FORMAT, testName, stepName, "actual");
-            string expectedPath = string.Format(FILE_PATH_FORMAT, testName, stepName, "expected");
+            const string FILE_PATH_FORMAT = @"..\..\..\Tests\Approval\{0}_{1}_{2}_{3}.bmp";
+            string actualPath = string.Format(FILE_PATH_FORMAT, className, testName, stepName, "actual");
+            string expectedPath = string.Format(FILE_PATH_FORMAT, className, testName, stepName, "expected");
 
             bitmap.Save(actualPath);
             var actualBytes = File.ReadAllBytes(actualPath);

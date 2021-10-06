@@ -3,23 +3,31 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace OrderCore.Client
 {
     public partial class MainWindow : Window
     {
-        private string m_strFieldID;
-        private List<Response> m_objResponses;
-        private readonly TcpClient clientSocket = new();
-        private NetworkStream serverStream;
-        delegate void ParameterizedMethodInvoker(string arg);
+        private const int port = 187;
+
+        private string activeFieldId = string.Empty;
+        private List<Response> allResponses;
+        private Socket socket;
+
+        private delegate void ParameterizedMethodInvoker(string arg);
 
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        public void ClickButton(string buttonName)
+        {
+            var button = LayoutRoot.FindName(buttonName) as ButtonBase;
+            button.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -35,12 +43,18 @@ namespace OrderCore.Client
             }
         }
 
-        private async void SendButton_Click(object sender, RoutedEventArgs e)
+        public void TypeText(string textBoxName, string text)
+        {
+            var textBox = LayoutRoot.FindName(textBoxName) as TextBox;
+            textBox.Text = text;
+        }
+
+        private void SendButton_Click(object sender, RoutedEventArgs e)
         {
             string strTemp;
-            if (m_strFieldID.Length > 0 && m_strFieldID != "\0")
+            if (activeFieldId.Length > 0 && activeFieldId != "\0")
             {
-                await SendDataAsync("T" + m_strFieldID + DataTextBox.Text);
+                Send(socket, "T" + activeFieldId + DataTextBox.Text);
                 CancelButton.IsEnabled = false;
                 DataTextBox.IsEnabled = false;
                 SendButton.IsEnabled = false;
@@ -48,60 +62,28 @@ namespace OrderCore.Client
             else
             {
                 strTemp = "<xml>";
-                foreach (var objResponse in m_objResponses)
+                foreach (var objResponse in allResponses)
                 {
                     strTemp += $"<response id=\"{objResponse.FieldId}\">{objResponse.UserResponse}</response>";
                 }
                 strTemp += "</xml>";
-                await SendDataAsync("F" + strTemp);
+                Send(socket, "F" + strTemp);
                 CancelButton.IsEnabled = false;
                 DataTextBox.IsEnabled = false;
                 SendButton.IsEnabled = false;
             }
         }
 
-        private async Task SendDataAsync(string stringData)
+        private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            var outStream = Encoding.ASCII.GetBytes(stringData);
-            await serverStream.WriteAsync(outStream.AsMemory(0, outStream.Length));
-            await serverStream.FlushAsync();
-        }
-
-        private async void StartButton_Click(object sender, RoutedEventArgs e)
-        {
-            await SendDataAsync("S");
-            m_strFieldID = "";
-            m_objResponses = new List<Response>();
+            Send(socket, "S");
+            activeFieldId = string.Empty;
+            allResponses = new List<Response>();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            string localIp;
-            using (var localSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
-            {
-                localSocket.Connect("8.8.8.8", 65530);
-                var endPoint = localSocket.LocalEndPoint as IPEndPoint;
-                localIp = endPoint.Address.ToString();
-            }
-
-            clientSocket.Connect(localIp, 187);
-            serverStream = clientSocket.GetStream();
-
-            var ctThread = new Thread(GetMessage);
-            ctThread.Start();
-        }
-
-        private void GetMessage(object obj)
-        {
-            while (true)
-            {
-                serverStream = clientSocket.GetStream();
-                var inStream = new byte[clientSocket.ReceiveBufferSize];
-                var buffSize = clientSocket.ReceiveBufferSize;
-                _ = serverStream.Read(inStream, 0, buffSize);
-                var returnData = Encoding.ASCII.GetString(inStream);
-                HandleDataArrival(returnData);
-            }
+            StartClient();
         }
 
         private void HandleDataArrival(string returnData)
@@ -129,18 +111,18 @@ namespace OrderCore.Client
                     SendButton.Visibility = Visibility.Hidden;
                     break;
                 case "R": // Request for more data
-                    strData3 = strData.Substring(0, 1);
-                    strData = strData[1..];
-                    if (m_strFieldID.Length > 0)
+                    strData3 = strData.Length > 0 ? strData.Substring(0, 1) : string.Empty;
+                    strData = strData.Length > 0 ? strData[1..] : strData;
+                    if (activeFieldId.Length > 0)
                     {
-                        m_objResponses.Add(new Response
+                        allResponses.Add(new Response
                         {
-                            FieldId = m_strFieldID,
+                            FieldId = activeFieldId,
                             UserResponse = DataTextBox.Text
                         });
                     }
-                    m_strFieldID = strData3;
-                    if (m_strFieldID.Length > 0 && m_strFieldID != "\0")
+                    activeFieldId = strData3;
+                    if (activeFieldId.Length > 0 && activeFieldId != "\0" && activeFieldId != string.Empty)
                     {
                         QuestionLabel.Content = strData;
                         ErrorLabel.Content = string.Empty;
@@ -158,7 +140,7 @@ namespace OrderCore.Client
                     else
                     {
                         QuestionLabel.Content = "Please confirm all fields, then submit:";
-                        foreach (var objResponse in m_objResponses)
+                        foreach (var objResponse in allResponses)
                         {
                             QuestionLabel.Content += $"\r\n{objResponse.FieldId}: {objResponse.UserResponse}";
                         }
@@ -203,10 +185,120 @@ namespace OrderCore.Client
             }
         }
 
-        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        private void StartClient()
         {
-            clientSocket.Close();
-            serverStream.Close();
+            try
+            {
+                IPAddress localIp;
+                using (var localSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+                {
+                    localSocket.Connect("8.8.8.8", 65530);
+                    var endPoint = localSocket.LocalEndPoint as IPEndPoint;
+                    localIp = endPoint.Address;
+                }
+
+                var remoteEP = new IPEndPoint(localIp, port);
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                socket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), socket);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
+
+        private void ConnectCallback(IAsyncResult ar)
+        {
+            try
+            {
+                Socket client = (Socket)ar.AsyncState;
+                client.EndConnect(ar);
+                Console.WriteLine("Socket connected to " + client.RemoteEndPoint.ToString());
+                Receive(client);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+
+        private void Receive(Socket client)
+        {
+            try
+            {
+                var state = new StateObject
+                {
+                    workSocket = client
+                };
+                _ = client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+
+        private void ReceiveCallback(IAsyncResult ar)
+        {
+            try
+            {
+                StateObject state = (StateObject)ar.AsyncState;
+                Socket client = state.workSocket;
+                int bytesRead = client.EndReceive(ar);
+                if (bytesRead > 0)
+                {
+                    _ = state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+                    _ = client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
+                    if (state.sb.Length > 0)
+                    {
+                        string value = state.sb.ToString();
+                        state.sb.Length = 0;
+                        HandleDataArrival(value);
+                    }
+                }
+                Receive(client);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+
+        private static void Send(Socket client, string data)
+        {
+            // Convert the string data to byte data using ASCII encoding.
+            byte[] byteData = Encoding.ASCII.GetBytes(data);
+
+            // Begin sending the data to the remote device.
+            _ = client.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), client);
+        }
+
+        private static void SendCallback(IAsyncResult ar)
+        {
+            try
+            {
+                Socket client = (Socket)ar.AsyncState;
+                int bytesSent = client.EndSend(ar);
+                Console.WriteLine("Sent {0} bytes to server.", bytesSent);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            socket.Shutdown(SocketShutdown.Both);
+            socket.Close();
+        }
+    }
+
+    public class StateObject
+    {
+        public Socket workSocket;
+        public const int BufferSize = 256;
+        public byte[] buffer = new byte[BufferSize];
+        public StringBuilder sb = new();
     }
 }

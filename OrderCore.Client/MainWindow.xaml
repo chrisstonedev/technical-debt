@@ -6,8 +6,8 @@
         mc:Ignorable="d"
         Title="Order Client" Height="488" Width="596"
         Loaded="Window_Loaded"
-        Unloaded="Window_Unloaded">
-    <Grid>
+        Closing="Window_Closing">
+    <Grid Name="LayoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="2*"/>
@@ -25,7 +25,7 @@
                 <Label Name="ErrorLabel" Grid.Row="1" FontSize="24" Foreground="Red" HorizontalAlignment="Center"></Label>
             </Grid>
         </Border>
-        <Button Name="StartButton" Grid.Row="2" Margin="150 20" FontSize="24" Click="StartButton_Click">S_tart</Button>
+        <Button Name="StartButton" Grid.Row="2" Margin="150 20" FontSize="24" Click="StartButton_Click" IsEnabled="False">S_tart</Button>
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

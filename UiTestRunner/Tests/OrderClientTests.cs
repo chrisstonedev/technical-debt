@@ -6,7 +6,7 @@ namespace UiTestRunner.Tests
 {
     public class OrderClientTests : TestClass
     {
-        private const string EXECUTABLE_PATH = @"..\..\..\..\OrderCore.Client\bin\Debug\net5.0-windows\OrderCore.Client.exe";
+        private const string EXECUTABLE_PATH = @"..\..\..\..\OrderClient\OrderClient.exe";
         private const int MILLISECOND_DELAY_BETWEEN_STEPS = 250;
 
         [TestRun]
@@ -16,29 +16,35 @@ namespace UiTestRunner.Tests
             await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
             var window = GetWindowHandle("Order Client");
             await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            AssertThatWindowMatchesExpectedState(window, "SuccessfulOrderTest", "Ready");
 
-            ClickButton(window, "S&tart");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            TypeText(window, "", "0142");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            AssertThatWindowMatchesExpectedState(window, "SuccessfulOrderTest", "NumericEntry");
+            try
+            {
+                AssertThatWindowMatchesExpectedState(window, "OrderClientTests", "SuccessfulOrderTest", "Ready");
 
-            ClickButton(window, "&Send");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            TypeText(window, "", "baba");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            AssertThatWindowMatchesExpectedState(window, "SuccessfulOrderTest", "CharacterEntry");
+                ClickButton(window, "S&tart");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                TypeText(window, "", "0142");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                AssertThatWindowMatchesExpectedState(window, "OrderClientTests", "SuccessfulOrderTest", "NumericEntry");
 
-            ClickButton(window, "&Send");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            AssertThatWindowMatchesExpectedState(window, "SuccessfulOrderTest", "Confirmation");
+                ClickButton(window, "&Send");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                TypeText(window, "", "baba");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                AssertThatWindowMatchesExpectedState(window, "OrderClientTests", "SuccessfulOrderTest", "CharacterEntry");
 
-            ClickButton(window, "&Submit");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            AssertThatWindowMatchesExpectedState(window, "SuccessfulOrderTest", "Finished");
+                ClickButton(window, "&Send");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                AssertThatWindowMatchesExpectedState(window, "OrderClientTests", "SuccessfulOrderTest", "Confirmation");
 
-            CloseWindow(window);
+                ClickButton(window, "&Submit");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                AssertThatWindowMatchesExpectedState(window, "OrderClientTests", "SuccessfulOrderTest", "Finished");
+            }
+            finally
+            {
+                CloseWindow(window);
+            }
         }
 
         [TestRun]
@@ -48,39 +54,45 @@ namespace UiTestRunner.Tests
             await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
             var window = GetWindowHandle("Order Client");
             await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            ClickButton(window, "S&tart");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            TypeText(window, "", "aaaa");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            ClickButton(window, "&Send");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            AssertThatWindowMatchesExpectedState(window, "DataValidationTest", "TextInCustomer");
 
-            TypeText(window, "", "0142");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            ClickButton(window, "&Send");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            TypeText(window, "", "b");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            ClickButton(window, "&Send");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            AssertThatWindowMatchesExpectedState(window, "DataValidationTest", "ProductTooShort");
+            try
+            {
+                ClickButton(window, "S&tart");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                TypeText(window, "", "aaaa");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                ClickButton(window, "&Send");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                AssertThatWindowMatchesExpectedState(window, "OrderClientTests", "DataValidationTest", "TextInCustomer");
 
-            TypeText(window, "", "123456789012");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            ClickButton(window, "&Send");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            AssertThatWindowMatchesExpectedState(window, "DataValidationTest", "ProductTooLong");
+                TypeText(window, "", "0142");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                ClickButton(window, "&Send");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                TypeText(window, "", "b");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                ClickButton(window, "&Send");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                AssertThatWindowMatchesExpectedState(window, "OrderClientTests", "DataValidationTest", "ProductTooShort");
 
-            TypeText(window, "", "12&34");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            ClickButton(window, "&Send");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            ClickButton(window, "&Submit");
-            await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
-            AssertThatWindowMatchesExpectedState(window, "DataValidationTest", "IncorrectXml");
+                TypeText(window, "", "123456789012");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                ClickButton(window, "&Send");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                AssertThatWindowMatchesExpectedState(window, "OrderClientTests", "DataValidationTest", "ProductTooLong");
 
-            CloseWindow(window);
+                TypeText(window, "", "12&34");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                ClickButton(window, "&Send");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                ClickButton(window, "&Submit");
+                await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
+                AssertThatWindowMatchesExpectedState(window, "OrderClientTests", "DataValidationTest", "IncorrectXml");
+            }
+            finally
+            {
+                CloseWindow(window);
+            }
         }
     }
 }
