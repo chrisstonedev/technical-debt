@@ -4,6 +4,7 @@ Reference=*\G{F5078F18-C551-11D3-89B9-0000F81FE221}#6.0#0#..\..\..\..\..\..\..\W
 Object={248DD890-BB45-11CF-9ABC-0080C7E7B78D}#1.0#0; MSWINSCK.OCX
 Form=frmServer.frm
 Class=clsResponse; clsResponse.cls
+Class=clsOrder; clsOrder.cls
 Startup="frmServer"
 HelpFile=""
 Title="Socket Project"

@@ -59,7 +59,6 @@ Private Sub Form_Load()
     Dim strFile As String
     strFile = "DB_FIELDS.TXT"
     intFile = FreeFile
-    'Read
     Dim strLine As String
     On Error Resume Next
     Open strFile For Input As #intFile
@@ -110,27 +109,27 @@ End Sub
 
 Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
     Dim strData, strData2, strData3 As String
-    Dim objDocument As DOMDocument60
+    Dim objDoc As DOMDocument60
     Dim blnSuccess As Boolean
     Dim objNode As IXMLDOMNode
-    Dim objNodeList As IXMLDOMNodeList
+    Dim objNodes As IXMLDOMNodeList
     Dim strJson As String
-    Dim objFieldsToSave As Collection
-    Dim objResponse As clsResponse
+    Dim objFld As Collection
+    Dim objRes As clsResponse
     Dim intFile As Integer
     Dim strFile As String
     Dim strLine As String
     Dim strTemp As String
-    Dim strFieldsFile As String
-    Dim intFieldsFile As Integer
-    Dim strFieldsLine As String
+    Dim strFF As String
+    Dim intFF As Integer
+    Dim strFFLn As String
 
     On Error GoTo Log_Error
 
     Call objWinsock.GetData(strData, vbString)
 
     strFile = "DB_AUDIT.TXT"
-    strFieldsFile = "DB_FIELDS.TXT"
+    strFF = "DB_FIELDS.TXT"
     intFile = FreeFile
     Open strFile For Append As #intFile
     txtMain.SelText = "RECEIVED: " & strData & vbCrLf
@@ -142,11 +141,11 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
         Case "T"
             strData3 = Left(strData, 1)
             strData = Mid(strData, 2)
-            Dim blnSuccessfulValidation As Boolean
+            Dim blnTmp As Boolean
             Select Case strData3
                 Case "C"
                     If IsNumeric(strData) Then
-                        blnSuccessfulValidation = True
+                        blnTmp = True
                     Else
                         txtMain.SelText = "SENT: " & "ECustomer ID could not be found" & vbCrLf
                         Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "ECustomer ID could not be found"
@@ -155,7 +154,7 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
                 Case "P"
                     If Len(strData) > 2 Then
                         If Len(strData) <= 10 Then
-                            blnSuccessfulValidation = True
+                            blnTmp = True
                         Else
                             txtMain.SelText = "SENT: " & "EProduct ID is too long" & vbCrLf
                             Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "EProduct ID is too long"
@@ -168,79 +167,101 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
                     End If
             End Select
 
-            Dim blnUseTheNextOne As Boolean
-            Dim strLineToUse As String
+            Dim blnNxt As Boolean
+            Dim strLn As String
 
-            intFieldsFile = FreeFile
-            If blnSuccessfulValidation Then
-                strFieldsFile = "DB_FIELDS.TXT"
-                Open strFieldsFile For Input As #intFieldsFile
-                Do While Not EOF(intFieldsFile)
-                    Line Input #intFieldsFile, strFieldsLine
-                    If blnUseTheNextOne Then
-                        strLineToUse = strFieldsLine
-                        blnUseTheNextOne = False
+            intFF = FreeFile
+            If blnTmp Then
+                strFF = "DB_FIELDS.TXT"
+                Open strFF For Input As #intFF
+                Do While Not EOF(intFF)
+                    Line Input #intFF, strFFLn
+                    If blnNxt Then
+                        strLn = strFFLn
+                        blnNxt = False
                     End If
-                    If Left(strFieldsLine, 1) = strData3 Then
-                        blnUseTheNextOne = True
+                    If Left(strFFLn, 1) = strData3 Then
+                        blnNxt = True
                     End If
                 Loop
-                Close #intFieldsFile
+                Close #intFF
 
-                Dim strFieldName As String
-                Select Case Left(strLineToUse, 1)
+                Dim strFN As String
+                Select Case Left(strLn, 1)
                     Case "C"
-                        strFieldName = "Customer  "
+                        strFN = "Customer  "
                     Case "P"
-                        strFieldName = "Product   "
+                        strFN = "Product   "
                     Case "Q"
-                        strFieldName = "Quantity  "
+                        strFN = "Quantity  "
                     Case "R"
-                        strFieldName = "Price     "
+                        strFN = "Price     "
                 End Select
-                strLineToUse = Left(strLineToUse, 1) & strFieldName & Mid(strLineToUse, 2)
+                strLn = Left(strLn, 1) & strFN & Mid(strLn, 2)
 
-                txtMain.SelText = "SENT: " & "R" & strLineToUse & vbCrLf
-                Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "R" & strLineToUse
-                objWinsock.SendData "R" & strLineToUse
+                txtMain.SelText = "SENT: " & "R" & strLn & vbCrLf
+                Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "R" & strLn
+                objWinsock.SendData "R" & strLn
             End If
         Case "S"
-            intFieldsFile = FreeFile
-            Open strFieldsFile For Input As #intFieldsFile
-            Line Input #intFieldsFile, strFieldsLine
-            Close #intFieldsFile
+            intFF = FreeFile
+            Open strFF For Input As #intFF
+            Line Input #intFF, strFFLn
+            Close #intFF
 
-            Dim strFirstFieldName As String
-            Select Case Left(strFieldsLine, 1)
+            Dim strFFN As String
+            Select Case Left(strFFLn, 1)
                 Case "C"
-                    strFirstFieldName = "Customer  "
+                    strFFN = "Customer  "
                 Case "P"
-                    strFirstFieldName = "Product   "
+                    strFFN = "Product   "
                 Case "Q"
-                    strFirstFieldName = "Quantity  "
+                    strFFN = "Quantity  "
                 Case "R"
-                    strFirstFieldName = "Price     "
+                    strFFN = "Price     "
             End Select
-            strFieldsLine = Left(strFieldsLine, 1) & strFirstFieldName & Mid(strFieldsLine, 2)
-            txtMain.SelText = "SENT: " & "R" & strFieldsLine & vbCrLf
-            Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "R" & strFieldsLine
-            objWinsock.SendData "R" & strFieldsLine
+            strFFLn = Left(strFFLn, 1) & strFFN & Mid(strFFLn, 2)
+            txtMain.SelText = "SENT: " & "R" & strFFLn & vbCrLf
+            Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "R" & strFFLn
+            objWinsock.SendData "R" & strFFLn
         Case "F"
-            Set objDocument = New DOMDocument60
-            blnSuccess = objDocument.loadXML(strData)
+            Set objDoc = New DOMDocument60
+            blnSuccess = objDoc.loadXML(strData)
             If blnSuccess Then
-                Set objNodeList = objDocument.selectNodes("/xml/*")
-                Set objFieldsToSave = New Collection
-                For Each objNode In objNodeList
-                    Set objResponse = New clsResponse
-                    objResponse.FieldID = objNode.Attributes.getNamedItem("id").Text
-                    objResponse.UserResponse = objNode.Text
-                    objFieldsToSave.Add objResponse
+                Set objNodes = objDoc.selectNodes("/xml/*")
+                Set objFld = New Collection
+                For Each objNode In objNodes
+                    Set objRes = New clsResponse
+                    objRes.FieldID = objNode.Attributes.getNamedItem("id").Text
+                    objRes.UserResponse = objNode.Text
+                    objFld.Add objRes
                 Next objNode
-                For Each objResponse In objFieldsToSave
-                    'txtMain.SelText = "Client wants to use data """ & objResponse.UserResponse & """ for field of id """ & objResponse.FieldID & """" & vbCrLf
-                Next objResponse
-                'TODO: Attempt to save to database.
+
+                Dim objOrder As clsOrder
+                Set objOrder = New clsOrder
+                
+                For Each objRes In objFld
+                    Select Case objRes.FieldID
+                        Case "C"
+                            objOrder.Customer = objRes.UserResponse
+                        Case "P"
+                            objOrder.Product = objRes.UserResponse
+                        Case "Q"
+                            objOrder.Quantity = CInt(objRes.UserResponse)
+                        Case "R"
+                            objOrder.Price = CDbl(objRes.UserResponse)
+                    End Select
+                Next objRes
+
+                Dim intOrdersFile As Integer
+                Dim strOrdersFile As String
+
+                strOrdersFile = "DB_ORDERS.TXT"
+                intOrdersFile = FreeFile
+                Open strOrdersFile For Append As #intOrdersFile
+                Print #intOrdersFile, objOrder.ToDatabaseFormat
+                Close intOrdersFile
+
                 txtMain.SelText = "SENT: " & "F" & vbCrLf
                 Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "F"
                 objWinsock.SendData "F"
@@ -254,7 +275,6 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
 Done:
 
     Close #intFile
-
     Exit Sub
 
 Log_Error:
