@@ -14,6 +14,7 @@ namespace OrderCore.Client
         private const int port = 187;
 
         private string activeFieldId = string.Empty;
+        private string activeFieldName;
         private List<Response> allResponses;
         private Socket socket;
 
@@ -118,12 +119,16 @@ namespace OrderCore.Client
                         allResponses.Add(new Response
                         {
                             FieldId = activeFieldId,
+                            FieldName = activeFieldName,
                             UserResponse = DataTextBox.Text
                         });
                     }
                     activeFieldId = strData3;
                     if (activeFieldId.Length > 0 && activeFieldId != "\0" && activeFieldId != string.Empty)
                     {
+                        activeFieldName = strData.Substring(0, 10).Trim();
+                        strData = strData[10..].Trim();
+
                         QuestionLabel.Content = strData;
                         ErrorLabel.Content = string.Empty;
                         StartButton.Visibility = Visibility.Hidden;
@@ -142,7 +147,7 @@ namespace OrderCore.Client
                         QuestionLabel.Content = "Please confirm all fields, then submit:";
                         foreach (var objResponse in allResponses)
                         {
-                            QuestionLabel.Content += $"\r\n{objResponse.FieldId}: {objResponse.UserResponse}";
+                            QuestionLabel.Content += $"\r\n{objResponse.FieldName}: {objResponse.UserResponse}";
                         }
                         ErrorLabel.Content = string.Empty;
                         StartButton.Visibility = Visibility.Hidden;

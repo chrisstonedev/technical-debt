@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -10,11 +12,12 @@ using UiTestRunner.TestFramework;
 
 namespace UiTestRunner
 {
-    /// <summary>
-    /// Summary description for Form1.
-    /// </summary>
     public partial class Form1 : Form
     {
+        private readonly Dictionary<(string, string), string> errorText = new();
+        private string actualImageFile;
+        private string expectedImageFile;
+
         public Form1()
         {
             InitializeComponent();
@@ -35,7 +38,7 @@ namespace UiTestRunner
                         try
                         {
                             await (method.Invoke(null, null) as Task);
-                            SetTestStatus(type.Name, method.Name, true, DateTime.Now.ToString(new CultureInfo("en-US")));
+                            SetTestStatus(type.Name, method.Name, true, DateTime.Now.ToString(CultureInfo.InvariantCulture));
                         }
                         catch (Exception ex)
                         {
@@ -49,13 +52,13 @@ namespace UiTestRunner
         private void SetTestStatus(string className, string testName, bool wasSuccessful, string data)
         {
             var status = wasSuccessful ? "Success" : "Failed";
+            errorText[(className, testName)] = data;
             foreach (DataGridViewRow row in testResultsDataGridView.Rows)
             {
                 if (row.Cells[0].Value.ToString().Equals(className, StringComparison.Ordinal)
                     && row.Cells[1].Value.ToString().Equals(testName, StringComparison.Ordinal))
                 {
                     row.Cells[2].Value = status;
-                    row.Cells[3].Value = data;
                     return;
                 }
             }
@@ -79,7 +82,7 @@ namespace UiTestRunner
                 if (MessageBox.Show("Couldn't find the program. Do you want to start it?", "TestWinAPI", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     var process = Process.Start(@"..\..\..\..\OrderCore.Client\bin\Debug\net5.0-windows\OrderCore.Client.exe");
-                    windowControlTextBox.Text = ((int)process.Handle).ToString(new CultureInfo("en-US"));
+                    windowControlTextBox.Text = ((int)process.Handle).ToString(CultureInfo.InvariantCulture);
                 }
             }
         }
@@ -91,7 +94,7 @@ namespace UiTestRunner
             try
             {
                 var hwnd = windowControlTextBox.TextLength > 0
-                    ? int.Parse(windowControlTextBox.Text, new CultureInfo("en-US"))
+                    ? int.Parse(windowControlTextBox.Text, CultureInfo.InvariantCulture)
                     : TestClass.GetWindowHandle(windowTitleTextBox.Text);
                 var children = LegacyMethods.ListAllChildren((IntPtr)hwnd);
 
@@ -104,6 +107,57 @@ namespace UiTestRunner
             {
                 _ = MessageBox.Show("Couldn't find the program.", "TestWinAPI", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
+            }
+        }
+
+        private void testResultsDataGridView_SelectionChanged(object sender, EventArgs e)
+        {
+            if (testResultsDataGridView.SelectedRows.Count > 0)
+            {
+                var selectedRow = testResultsDataGridView.SelectedRows[0];
+                var className = selectedRow.Cells[0].Value.ToString();
+                var testName = selectedRow.Cells[1].Value.ToString();
+                errorDetailsTextBox.Text = errorText[(className, testName)];
+
+                const string DIRECTORY_PATH = @"..\..\..\Tests\Approval\";
+                const string FILE_FORMAT = "{0}_{1}_*_{2}.bmp";
+                string actualFileNamePattern = string.Format(FILE_FORMAT, className, testName, "actual");
+                var files = Directory.GetFiles(DIRECTORY_PATH, actualFileNamePattern, SearchOption.TopDirectoryOnly);
+                if (files.Length > 0)
+                {
+                    actualImageFile = files.First();
+                    expectedImageFile = actualImageFile.Replace("_actual.bmp", "_expected.bmp");
+
+                    expectedPictureBox.Image = ImageFromFile(expectedImageFile);
+                    actualPictureBox.Image = ImageFromFile(actualImageFile);
+                }
+                else
+                {
+                    expectedPictureBox.Image = null;
+                    actualPictureBox.Image = null;
+                }
+            }
+            else
+            {
+                errorDetailsTextBox.Text = string.Empty;
+                expectedPictureBox.Image = null;
+                actualPictureBox.Image = null;
+            }
+        }
+
+        private static Image ImageFromFile(string path)
+        {
+            var bytes = File.ReadAllBytes(path);
+            using var ms = new MemoryStream(bytes);
+            var img = Image.FromStream(ms);
+            return img;
+        }
+
+        private void approveNewChangeButton_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to replace the current expected image with the new actual image?", "UI Approval Test Runner", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+            {
+                File.Move(actualImageFile, expectedImageFile, true);
             }
         }
     }

@@ -33,54 +33,73 @@ namespace UiTestRunner
 		private void InitializeComponent()
 		{
             System.Windows.Forms.Label windowTitleLabel;
+            System.Windows.Forms.Panel leftPanel;
+            System.Windows.Forms.Label expectedLabel;
+            System.Windows.Forms.Label actualLabel;
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.runTestsButton = new System.Windows.Forms.Button();
             this.closeProgramButton = new System.Windows.Forms.Button();
             this.checkProgramIsOpenButton = new System.Windows.Forms.Button();
             this.windowTitleTextBox = new System.Windows.Forms.TextBox();
+            this.runTestsButton = new System.Windows.Forms.Button();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.testResultsTabPage = new System.Windows.Forms.TabPage();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.testResultsDataGridView = new System.Windows.Forms.DataGridView();
+            this.classNameTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.testResultNameTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.testResultStatusTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.expectedPictureBox = new System.Windows.Forms.PictureBox();
+            this.actualPictureBox = new System.Windows.Forms.PictureBox();
+            this.errorDetailsTextBox = new System.Windows.Forms.TextBox();
             this.windowControlsTabPage = new System.Windows.Forms.TabPage();
-            this.windowControlTextBox = new System.Windows.Forms.TextBox();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.listWindowControlsButton = new System.Windows.Forms.Button();
             this.dataGridView = new System.Windows.Forms.DataGridView();
             this.WindowHandle = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ClassName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ParentHandle = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.listWindowControlsButton = new System.Windows.Forms.Button();
-            this.classNameTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.testResultNameTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.testResultStatusTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.testResultDataTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.windowControlTextBox = new System.Windows.Forms.TextBox();
+            this.approveNewChangeButton = new System.Windows.Forms.Button();
             windowTitleLabel = new System.Windows.Forms.Label();
+            leftPanel = new System.Windows.Forms.Panel();
+            expectedLabel = new System.Windows.Forms.Label();
+            actualLabel = new System.Windows.Forms.Label();
+            leftPanel.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.testResultsTabPage.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.testResultsDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.expectedPictureBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.actualPictureBox)).BeginInit();
             this.windowControlsTabPage.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // windowTitleLabel
             // 
             windowTitleLabel.AutoSize = true;
-            windowTitleLabel.Location = new System.Drawing.Point(12, 12);
+            windowTitleLabel.Location = new System.Drawing.Point(12, 9);
             windowTitleLabel.Name = "windowTitleLabel";
             windowTitleLabel.Size = new System.Drawing.Size(74, 15);
             windowTitleLabel.TabIndex = 7;
             windowTitleLabel.Text = "Window title";
             // 
-            // runTestsButton
+            // leftPanel
             // 
-            this.runTestsButton.Location = new System.Drawing.Point(6, 6);
-            this.runTestsButton.Name = "runTestsButton";
-            this.runTestsButton.Size = new System.Drawing.Size(144, 28);
-            this.runTestsButton.TabIndex = 0;
-            this.runTestsButton.Text = "Run tests";
-            this.runTestsButton.Click += new System.EventHandler(this.RunClientTestButton_Click);
+            leftPanel.Controls.Add(windowTitleLabel);
+            leftPanel.Controls.Add(this.closeProgramButton);
+            leftPanel.Controls.Add(this.checkProgramIsOpenButton);
+            leftPanel.Controls.Add(this.windowTitleTextBox);
+            leftPanel.Dock = System.Windows.Forms.DockStyle.Left;
+            leftPanel.Location = new System.Drawing.Point(0, 0);
+            leftPanel.Name = "leftPanel";
+            leftPanel.Size = new System.Drawing.Size(167, 505);
+            leftPanel.TabIndex = 9;
             // 
             // closeProgramButton
             // 
-            this.closeProgramButton.Location = new System.Drawing.Point(12, 93);
+            this.closeProgramButton.Location = new System.Drawing.Point(12, 90);
             this.closeProgramButton.Name = "closeProgramButton";
             this.closeProgramButton.Size = new System.Drawing.Size(144, 28);
             this.closeProgramButton.TabIndex = 2;
@@ -89,7 +108,7 @@ namespace UiTestRunner
             // 
             // checkProgramIsOpenButton
             // 
-            this.checkProgramIsOpenButton.Location = new System.Drawing.Point(12, 59);
+            this.checkProgramIsOpenButton.Location = new System.Drawing.Point(12, 56);
             this.checkProgramIsOpenButton.Name = "checkProgramIsOpenButton";
             this.checkProgramIsOpenButton.Size = new System.Drawing.Size(144, 28);
             this.checkProgramIsOpenButton.TabIndex = 3;
@@ -98,33 +117,86 @@ namespace UiTestRunner
             // 
             // windowTitleTextBox
             // 
-            this.windowTitleTextBox.Location = new System.Drawing.Point(12, 30);
+            this.windowTitleTextBox.Location = new System.Drawing.Point(12, 27);
             this.windowTitleTextBox.Name = "windowTitleTextBox";
             this.windowTitleTextBox.Size = new System.Drawing.Size(144, 23);
             this.windowTitleTextBox.TabIndex = 6;
             this.windowTitleTextBox.Text = "Order Client";
             // 
+            // expectedLabel
+            // 
+            expectedLabel.AutoSize = true;
+            expectedLabel.Location = new System.Drawing.Point(228, 230);
+            expectedLabel.Name = "expectedLabel";
+            expectedLabel.Size = new System.Drawing.Size(58, 15);
+            expectedLabel.TabIndex = 11;
+            expectedLabel.Text = "Expected:";
+            // 
+            // actualLabel
+            // 
+            actualLabel.AutoSize = true;
+            actualLabel.Location = new System.Drawing.Point(454, 230);
+            actualLabel.Name = "actualLabel";
+            actualLabel.Size = new System.Drawing.Size(44, 15);
+            actualLabel.TabIndex = 12;
+            actualLabel.Text = "Actual:";
+            // 
+            // runTestsButton
+            // 
+            this.runTestsButton.Location = new System.Drawing.Point(3, 3);
+            this.runTestsButton.Name = "runTestsButton";
+            this.runTestsButton.Size = new System.Drawing.Size(144, 28);
+            this.runTestsButton.TabIndex = 0;
+            this.runTestsButton.Text = "Run tests";
+            this.runTestsButton.Click += new System.EventHandler(this.RunClientTestButton_Click);
+            // 
             // tabControl
             // 
             this.tabControl.Controls.Add(this.testResultsTabPage);
             this.tabControl.Controls.Add(this.windowControlsTabPage);
-            this.tabControl.Location = new System.Drawing.Point(169, 12);
+            this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl.Location = new System.Drawing.Point(167, 0);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(485, 284);
+            this.tabControl.Size = new System.Drawing.Size(692, 505);
             this.tabControl.TabIndex = 8;
             // 
             // testResultsTabPage
             // 
-            this.testResultsTabPage.Controls.Add(this.testResultsDataGridView);
-            this.testResultsTabPage.Controls.Add(this.runTestsButton);
+            this.testResultsTabPage.Controls.Add(this.tableLayoutPanel1);
             this.testResultsTabPage.Location = new System.Drawing.Point(4, 24);
             this.testResultsTabPage.Name = "testResultsTabPage";
             this.testResultsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.testResultsTabPage.Size = new System.Drawing.Size(477, 256);
+            this.testResultsTabPage.Size = new System.Drawing.Size(684, 477);
             this.testResultsTabPage.TabIndex = 1;
             this.testResultsTabPage.Text = "Test results";
             this.testResultsTabPage.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 3;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33332F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.tableLayoutPanel1.Controls.Add(this.runTestsButton, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.testResultsDataGridView, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.expectedPictureBox, 1, 3);
+            this.tableLayoutPanel1.Controls.Add(this.actualPictureBox, 2, 3);
+            this.tableLayoutPanel1.Controls.Add(this.errorDetailsTextBox, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(expectedLabel, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(actualLabel, 2, 2);
+            this.tableLayoutPanel1.Controls.Add(this.approveNewChangeButton, 1, 4);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 5;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(678, 471);
+            this.tableLayoutPanel1.TabIndex = 8;
             // 
             // testResultsDataGridView
             // 
@@ -135,8 +207,8 @@ namespace UiTestRunner
             this.testResultsDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.classNameTextBoxColumn,
             this.testResultNameTextBoxColumn,
-            this.testResultStatusTextBoxColumn,
-            this.testResultDataTextBoxColumn});
+            this.testResultStatusTextBoxColumn});
+            this.tableLayoutPanel1.SetColumnSpan(this.testResultsDataGridView, 3);
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
@@ -145,32 +217,107 @@ namespace UiTestRunner
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.testResultsDataGridView.DefaultCellStyle = dataGridViewCellStyle1;
-            this.testResultsDataGridView.Location = new System.Drawing.Point(6, 40);
+            this.testResultsDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.testResultsDataGridView.Location = new System.Drawing.Point(3, 37);
             this.testResultsDataGridView.Name = "testResultsDataGridView";
             this.testResultsDataGridView.ReadOnly = true;
             this.testResultsDataGridView.RowTemplate.Height = 25;
-            this.testResultsDataGridView.Size = new System.Drawing.Size(465, 210);
+            this.testResultsDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.testResultsDataGridView.Size = new System.Drawing.Size(672, 190);
             this.testResultsDataGridView.TabIndex = 7;
+            this.testResultsDataGridView.SelectionChanged += new System.EventHandler(this.testResultsDataGridView_SelectionChanged);
+            // 
+            // classNameTextBoxColumn
+            // 
+            this.classNameTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.classNameTextBoxColumn.HeaderText = "Class";
+            this.classNameTextBoxColumn.Name = "classNameTextBoxColumn";
+            this.classNameTextBoxColumn.ReadOnly = true;
+            // 
+            // testResultNameTextBoxColumn
+            // 
+            this.testResultNameTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.testResultNameTextBoxColumn.HeaderText = "Test";
+            this.testResultNameTextBoxColumn.Name = "testResultNameTextBoxColumn";
+            this.testResultNameTextBoxColumn.ReadOnly = true;
+            // 
+            // testResultStatusTextBoxColumn
+            // 
+            this.testResultStatusTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.testResultStatusTextBoxColumn.HeaderText = "Result";
+            this.testResultStatusTextBoxColumn.Name = "testResultStatusTextBoxColumn";
+            this.testResultStatusTextBoxColumn.ReadOnly = true;
+            // 
+            // expectedPictureBox
+            // 
+            this.expectedPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.expectedPictureBox.Location = new System.Drawing.Point(228, 248);
+            this.expectedPictureBox.Name = "expectedPictureBox";
+            this.expectedPictureBox.Size = new System.Drawing.Size(220, 190);
+            this.expectedPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.expectedPictureBox.TabIndex = 9;
+            this.expectedPictureBox.TabStop = false;
+            // 
+            // actualPictureBox
+            // 
+            this.actualPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.actualPictureBox.Location = new System.Drawing.Point(454, 248);
+            this.actualPictureBox.Name = "actualPictureBox";
+            this.actualPictureBox.Size = new System.Drawing.Size(221, 190);
+            this.actualPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.actualPictureBox.TabIndex = 8;
+            this.actualPictureBox.TabStop = false;
+            // 
+            // errorDetailsTextBox
+            // 
+            this.errorDetailsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.errorDetailsTextBox.Location = new System.Drawing.Point(3, 233);
+            this.errorDetailsTextBox.Multiline = true;
+            this.errorDetailsTextBox.Name = "errorDetailsTextBox";
+            this.errorDetailsTextBox.ReadOnly = true;
+            this.tableLayoutPanel1.SetRowSpan(this.errorDetailsTextBox, 3);
+            this.errorDetailsTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.errorDetailsTextBox.Size = new System.Drawing.Size(219, 235);
+            this.errorDetailsTextBox.TabIndex = 10;
             // 
             // windowControlsTabPage
             // 
-            this.windowControlsTabPage.Controls.Add(this.windowControlTextBox);
-            this.windowControlsTabPage.Controls.Add(this.dataGridView);
-            this.windowControlsTabPage.Controls.Add(this.listWindowControlsButton);
+            this.windowControlsTabPage.Controls.Add(this.tableLayoutPanel2);
             this.windowControlsTabPage.Location = new System.Drawing.Point(4, 24);
             this.windowControlsTabPage.Name = "windowControlsTabPage";
             this.windowControlsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.windowControlsTabPage.Size = new System.Drawing.Size(477, 256);
+            this.windowControlsTabPage.Size = new System.Drawing.Size(684, 477);
             this.windowControlsTabPage.TabIndex = 2;
             this.windowControlsTabPage.Text = "Window controls";
             this.windowControlsTabPage.UseVisualStyleBackColor = true;
             // 
-            // windowControlTextBox
+            // tableLayoutPanel2
             // 
-            this.windowControlTextBox.Location = new System.Drawing.Point(167, 10);
-            this.windowControlTextBox.Name = "windowControlTextBox";
-            this.windowControlTextBox.Size = new System.Drawing.Size(100, 23);
-            this.windowControlTextBox.TabIndex = 9;
+            this.tableLayoutPanel2.ColumnCount = 3;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.Controls.Add(this.listWindowControlsButton, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.dataGridView, 0, 1);
+            this.tableLayoutPanel2.Controls.Add(this.windowControlTextBox, 1, 0);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(678, 471);
+            this.tableLayoutPanel2.TabIndex = 10;
+            // 
+            // listWindowControlsButton
+            // 
+            this.listWindowControlsButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.listWindowControlsButton.Location = new System.Drawing.Point(3, 3);
+            this.listWindowControlsButton.Name = "listWindowControlsButton";
+            this.listWindowControlsButton.Size = new System.Drawing.Size(144, 28);
+            this.listWindowControlsButton.TabIndex = 7;
+            this.listWindowControlsButton.Text = "List window controls";
+            this.listWindowControlsButton.Click += new System.EventHandler(this.ListWindowControlsButton_Click);
             // 
             // dataGridView
             // 
@@ -182,11 +329,13 @@ namespace UiTestRunner
             this.WindowHandle,
             this.ClassName,
             this.ParentHandle});
-            this.dataGridView.Location = new System.Drawing.Point(6, 40);
+            this.tableLayoutPanel2.SetColumnSpan(this.dataGridView, 3);
+            this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView.Location = new System.Drawing.Point(3, 37);
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.ReadOnly = true;
             this.dataGridView.RowTemplate.Height = 25;
-            this.dataGridView.Size = new System.Drawing.Size(465, 210);
+            this.dataGridView.Size = new System.Drawing.Size(672, 431);
             this.dataGridView.TabIndex = 6;
             // 
             // WindowHandle
@@ -210,67 +359,49 @@ namespace UiTestRunner
             this.ParentHandle.Name = "ParentHandle";
             this.ParentHandle.ReadOnly = true;
             // 
-            // listWindowControlsButton
+            // windowControlTextBox
             // 
-            this.listWindowControlsButton.Location = new System.Drawing.Point(6, 6);
-            this.listWindowControlsButton.Name = "listWindowControlsButton";
-            this.listWindowControlsButton.Size = new System.Drawing.Size(144, 28);
-            this.listWindowControlsButton.TabIndex = 7;
-            this.listWindowControlsButton.Text = "List window controls";
-            this.listWindowControlsButton.Click += new System.EventHandler(this.ListWindowControlsButton_Click);
+            this.windowControlTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.windowControlTextBox.Location = new System.Drawing.Point(153, 5);
+            this.windowControlTextBox.Name = "windowControlTextBox";
+            this.windowControlTextBox.Size = new System.Drawing.Size(100, 23);
+            this.windowControlTextBox.TabIndex = 9;
             // 
-            // classNameTextBoxColumn
+            // approveNewChangeButton
             // 
-            this.classNameTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.classNameTextBoxColumn.HeaderText = "Class";
-            this.classNameTextBoxColumn.Name = "classNameTextBoxColumn";
-            this.classNameTextBoxColumn.ReadOnly = true;
-            this.classNameTextBoxColumn.Width = 59;
-            // 
-            // testResultNameTextBoxColumn
-            // 
-            this.testResultNameTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.testResultNameTextBoxColumn.HeaderText = "Test";
-            this.testResultNameTextBoxColumn.Name = "testResultNameTextBoxColumn";
-            this.testResultNameTextBoxColumn.ReadOnly = true;
-            this.testResultNameTextBoxColumn.Width = 52;
-            // 
-            // testResultStatusTextBoxColumn
-            // 
-            this.testResultStatusTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.testResultStatusTextBoxColumn.HeaderText = "Result";
-            this.testResultStatusTextBoxColumn.Name = "testResultStatusTextBoxColumn";
-            this.testResultStatusTextBoxColumn.ReadOnly = true;
-            this.testResultStatusTextBoxColumn.Width = 64;
-            // 
-            // testResultDataTextBoxColumn
-            // 
-            this.testResultDataTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.testResultDataTextBoxColumn.HeaderText = "Data";
-            this.testResultDataTextBoxColumn.Name = "testResultDataTextBoxColumn";
-            this.testResultDataTextBoxColumn.ReadOnly = true;
+            this.approveNewChangeButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.tableLayoutPanel1.SetColumnSpan(this.approveNewChangeButton, 2);
+            this.approveNewChangeButton.Location = new System.Drawing.Point(369, 444);
+            this.approveNewChangeButton.Name = "approveNewChangeButton";
+            this.approveNewChangeButton.Size = new System.Drawing.Size(165, 23);
+            this.approveNewChangeButton.TabIndex = 13;
+            this.approveNewChangeButton.Text = "Approve New Change";
+            this.approveNewChangeButton.UseVisualStyleBackColor = true;
+            this.approveNewChangeButton.Click += new System.EventHandler(this.approveNewChangeButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(6, 16);
-            this.ClientSize = new System.Drawing.Size(666, 308);
+            this.ClientSize = new System.Drawing.Size(859, 505);
             this.Controls.Add(this.tabControl);
-            this.Controls.Add(windowTitleLabel);
-            this.Controls.Add(this.windowTitleTextBox);
-            this.Controls.Add(this.checkProgramIsOpenButton);
-            this.Controls.Add(this.closeProgramButton);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Controls.Add(leftPanel);
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Test Windows API";
+            leftPanel.ResumeLayout(false);
+            leftPanel.PerformLayout();
             this.tabControl.ResumeLayout(false);
             this.testResultsTabPage.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.testResultsDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.expectedPictureBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.actualPictureBox)).EndInit();
             this.windowControlsTabPage.ResumeLayout(false);
-            this.windowControlsTabPage.PerformLayout();
+            this.tableLayoutPanel2.ResumeLayout(false);
+            this.tableLayoutPanel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
 		}
 
@@ -291,10 +422,15 @@ namespace UiTestRunner
         private Button listWindowControlsButton;
         private DataGridView testResultsDataGridView;
         private TextBox windowControlTextBox;
+        private TableLayoutPanel tableLayoutPanel1;
+        private TableLayoutPanel tableLayoutPanel2;
+        private PictureBox expectedPictureBox;
+        private PictureBox actualPictureBox;
+        private TextBox errorDetailsTextBox;
         private DataGridViewTextBoxColumn classNameTextBoxColumn;
         private DataGridViewTextBoxColumn testResultNameTextBoxColumn;
         private DataGridViewTextBoxColumn testResultStatusTextBoxColumn;
-        private DataGridViewTextBoxColumn testResultDataTextBoxColumn;
+        private Button approveNewChangeButton;
     }
 }
 

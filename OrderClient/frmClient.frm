@@ -114,14 +114,6 @@ Begin VB.Form frmClient
       Top             =   0
       Width           =   4575
    End
-   Begin VB.Label lblServerNickname 
-      Height          =   135
-      Left            =   120
-      TabIndex        =   8
-      Top             =   4320
-      Visible         =   0   'False
-      Width           =   255
-   End
 End
 Attribute VB_Name = "frmClient"
 Attribute VB_GlobalNameSpace = False
@@ -131,6 +123,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private m_strFieldID As String
+Private m_strFieldName As String
 Private m_objResponses As Collection
 
 Private Sub cmdCancel_Click()
@@ -206,11 +199,14 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
             If Len(m_strFieldID) > 0 Then
                 Set objResponse = New clsResponse
                 objResponse.FieldID = m_strFieldID
+                objResponse.FieldName = m_strFieldName
                 objResponse.UserResponse = txtData.Text
                 m_objResponses.Add objResponse
             End If
             m_strFieldID = strData3
             If Len(m_strFieldID) > 0 Then
+                m_strFieldName = Trim(Left(strData, 10))
+                strData = Trim(Mid(strData, 11))
                 lblQuestion.Caption = strData
                 lblError.Caption = ""
                 cmdStart.Visible = False
@@ -226,7 +222,7 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
             Else
                 lblQuestion.Caption = "Please confirm all fields, then submit:"
                 For Each objResponse In m_objResponses
-                    lblQuestion.Caption = lblQuestion.Caption & vbCrLf & objResponse.FieldID & ": " & objResponse.UserResponse
+                    lblQuestion.Caption = lblQuestion.Caption & vbCrLf & objResponse.FieldName & ": " & objResponse.UserResponse
                 Next objResponse
                 lblError.Caption = ""
                 cmdStart.Visible = False
