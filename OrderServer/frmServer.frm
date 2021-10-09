@@ -52,19 +52,20 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+Private Const AUDIT_FILE_NAME As String = "DB_AUDIT.TXT"
+Private Const FIELDS_FILE_NAME As String = "DB_FIELDS.TXT"
+
 Private Sub Form_Load()
     lblYourIP.Caption = "Listening on: " & objWinsock.LocalIP & " ; 187"
 
     Dim intFile As Integer
-    Dim strFile As String
-    strFile = "DB_FIELDS.TXT"
     intFile = FreeFile
     Dim strLine As String
     On Error Resume Next
-    Open strFile For Input As #intFile
+    Open FIELDS_FILE_NAME For Input As #intFile
     If Err.Number = 53 Then
         If MsgBox("Database files cannot be found. Would you like to create them now?", vbYesNo, "OrderServer") = vbYes Then
-            Open strFile For Output As #intFile
+            Open FIELDS_FILE_NAME For Output As #intFile
             Print #intFile, _
                 "CEnter customer ID   " & vbCrLf & _
                 "PEnter product ID    "
@@ -72,6 +73,8 @@ Private Sub Form_Load()
         Else
             End
         End If
+    Else
+        Close #intFile
     End If
 
     objWinsock.Close
@@ -99,192 +102,53 @@ Private Sub objWinsock_ConnectionRequest(ByVal requestID As Long)
     objWinsock.Accept requestID
     txtStatus.Caption = "Status: Connected to client"
     txtMain.SelText = "SENT: " & "C" & vbCrLf
-    strFile = "DB_AUDIT.TXT"
     intFile = FreeFile
-    Open strFile For Append As #intFile
+    Open AUDIT_FILE_NAME For Append As #intFile
     Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "ECould not read data from client"
     Close intFile
     objWinsock.SendData "C"
 End Sub
 
 Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
-    Dim strData, strData2, strData3 As String
-    Dim XDC As DOMDocument60
-    Dim XP As Boolean
-    Dim ND As IXMLDOMNode
-    Dim NDS As IXMLDOMNodeList
-    Dim strJson As String
-    Dim FLD As Collection
-    Dim RES As clsResponse
-    Dim intFile As Integer
-    Dim strFile As String
-    Dim strLine As String
-    Dim strTemp As String
-    Dim strFF As String
-    Dim intFF As Integer
-    Dim strFFLn As String
+    Dim strData, strRequestType As String
 
     On Error GoTo Log_Error
 
     Call objWinsock.GetData(strData, vbString)
 
-    strFile = "DB_AUDIT.TXT"
-    strFF = "DB_FIELDS.TXT"
-    intFile = FreeFile
-    Open strFile For Append As #intFile
+    Dim intAuditFileReference As Integer
+    intAuditFileReference = FreeFile
+    Open AUDIT_FILE_NAME For Append As #intAuditFileReference
     txtMain.SelText = "RECEIVED: " & strData & vbCrLf
-    Print #intFile, "R" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & strData
+    Print #intAuditFileReference, "R" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & strData
 
-    strData2 = Left(strData, 1)
+    strRequestType = Left(strData, 1)
     strData = Mid(strData, 2)
-    Select Case strData2
+    Select Case strRequestType
         Case "T"
-            strData3 = Left(strData, 1)
-            strData = Mid(strData, 2)
-            Dim blnTmp As Boolean
-            Select Case strData3
-                Case "C"
-                    If IsNumeric(strData) Then
-                        blnTmp = True
-                    Else
-                        txtMain.SelText = "SENT: " & "ECustomer ID could not be found" & vbCrLf
-                        Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "ECustomer ID could not be found"
-                        objWinsock.SendData "ECustomer ID could not be found"
-                    End If
-                Case "P"
-                    If Len(strData) > 2 Then
-                        If Len(strData) <= 10 Then
-                            blnTmp = True
-                        Else
-                            txtMain.SelText = "SENT: " & "EProduct ID is too long" & vbCrLf
-                            Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "EProduct ID is too long"
-                            objWinsock.SendData "EProduct ID is too long"
-                        End If
-                    Else
-                        txtMain.SelText = "SENT: " & "EProduct ID is not long enough" & vbCrLf
-                        Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "EProduct ID is not long enough"
-                        objWinsock.SendData "EProduct ID is not long enough"
-                    End If
-            End Select
-
-            Dim blnNxt As Boolean
-            Dim strLn As String
-
-            intFF = FreeFile
-            If blnTmp Then
-                strFF = "DB_FIELDS.TXT"
-                Open strFF For Input As #intFF
-                Do While Not EOF(intFF)
-                    Line Input #intFF, strFFLn
-                    If blnNxt Then
-                        strLn = strFFLn
-                        blnNxt = False
-                    End If
-                    If Left(strFFLn, 1) = strData3 Then
-                        blnNxt = True
-                    End If
-                Loop
-                Close #intFF
-
-                Dim strFN As String
-                Select Case Left(strLn, 1)
-                    Case "C"
-                        strFN = "Customer  "
-                    Case "P"
-                        strFN = "Product   "
-                    Case "Q"
-                        strFN = "Quantity  "
-                    Case "R"
-                        strFN = "Price     "
-                End Select
-                strLn = Left(strLn, 1) & strFN & Mid(strLn, 2)
-
-                txtMain.SelText = "SENT: " & "R" & strLn & vbCrLf
-                Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "R" & strLn
-                objWinsock.SendData "R" & strLn
-            End If
+            Dim strFieldId As String
+            strFieldId = Left(strData, 1)
+            Dim strUserResponse As String
+            strUserResponse = Mid(strData, 2)
+            ValidateUserResponse strFieldId, strUserResponse, intAuditFileReference
         Case "S"
-            intFF = FreeFile
-            Open strFF For Input As #intFF
-            Line Input #intFF, strFFLn
-            Close #intFF
-
-            Dim strFFN As String
-            Select Case Left(strFFLn, 1)
-                Case "C"
-                    strFFN = "Customer  "
-                Case "P"
-                    strFFN = "Product   "
-                Case "Q"
-                    strFFN = "Quantity  "
-                Case "R"
-                    strFFN = "Price     "
-            End Select
-            strFFLn = Left(strFFLn, 1) & strFFN & Mid(strFFLn, 2)
-            txtMain.SelText = "SENT: " & "R" & strFFLn & vbCrLf
-            Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "R" & strFFLn
-            objWinsock.SendData "R" & strFFLn
+            HandleStartRequest intAuditFileReference
         Case "F"
-            Set XDC = New DOMDocument60
-            XP = XDC.loadXML(strData)
-            If XP Then
-                Set NDS = XDC.selectNodes("/xml/*")
-                Set FLD = New Collection
-                For Each ND In NDS
-                    Set RES = New clsResponse
-                    RES.FID = ND.Attributes.getNamedItem("id").Text
-                    RES.RES = ND.Text
-                    FLD.Add RES
-                Next ND
-
-                Dim objOrder As clsOrder
-                Set objOrder = New clsOrder
-                
-                For Each RES In FLD
-                    Select Case RES.FID
-                        Case "C"
-                            objOrder.CUS = RES.RES
-                        Case "P"
-                            objOrder.PRD = RES.RES
-                        Case "Q"
-                            objOrder.QTY = CInt(RES.RES)
-                        Case "R"
-                            objOrder.PRC = CDbl(RES.RES)
-                    End Select
-                Next RES
-
-                Dim intOrdersFile As Integer
-                Dim strOrdersFile As String
-
-                strOrdersFile = "DB_ORDERS.TXT"
-                intOrdersFile = FreeFile
-                Open strOrdersFile For Append As #intOrdersFile
-                Print #intOrdersFile, objOrder.ToDatabaseFormat
-                Close intOrdersFile
-
-                txtMain.SelText = "SENT: " & "F" & vbCrLf
-                Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "F"
-                objWinsock.SendData "F"
-            Else
-                txtMain.SelText = "SENT: " & "ECould not read data from client" & vbCrLf
-                Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "ECould not read data from client"
-                objWinsock.SendData "ECould not read data from client"
-            End If
+            CompleteOrder strData, intAuditFileReference
     End Select
 
 Done:
-
-    Close #intFile
+    Close #intAuditFileReference
     Exit Sub
 
 Log_Error:
     Dim ErrorNumber As Long
-    Dim ErrorDescription As String
     ErrorNumber = Err.Number
+    Dim ErrorDescription As String
     ErrorDescription = Err.Description
 
     On Error Resume Next
-    Print #intFile, "E" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & CStr(ErrorNumber) & ": " & ErrorDescription
+    Print #intAuditFileReference, "E" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & CStr(ErrorNumber) & ": " & ErrorDescription
     If Err.Number > 0 Then
         MsgBox "Serious error alert!" & vbCrLf & CStr(ErrorNumber) & ": " & ErrorDescription, vbCritical, "Order Server"
     End If
@@ -292,3 +156,151 @@ Log_Error:
     GoTo Done
 End Sub
 
+Private Sub ValidateUserResponse(ByVal strFieldId As String, ByVal strData As String, ByVal intAuditFileReference As Integer)
+    Dim blnTmp As Boolean
+    Select Case strFieldId
+        Case "C"
+            If IsNumeric(strData) Then
+                blnTmp = True
+            Else
+                txtMain.SelText = "SENT: " & "ECustomer ID could not be found" & vbCrLf
+                Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "ECustomer ID could not be found"
+                objWinsock.SendData "ECustomer ID could not be found"
+            End If
+        Case "P"
+            If Len(strData) > 2 Then
+                If Len(strData) <= 10 Then
+                    blnTmp = True
+                Else
+                    txtMain.SelText = "SENT: " & "EProduct ID is too long" & vbCrLf
+                    Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "EProduct ID is too long"
+                    objWinsock.SendData "EProduct ID is too long"
+                End If
+            Else
+                txtMain.SelText = "SENT: " & "EProduct ID is not long enough" & vbCrLf
+                Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "EProduct ID is not long enough"
+                objWinsock.SendData "EProduct ID is not long enough"
+            End If
+    End Select
+
+    Dim blnNxt As Boolean
+    Dim strLn As String
+
+    Dim intFieldsFileReference As Integer
+    intFieldsFileReference = FreeFile
+    If Not blnTmp Then
+        Exit Sub
+    End If
+
+    Dim strFieldsFileLine As String
+    Open FIELDS_FILE_NAME For Input As #intFieldsFileReference
+    Do While Not EOF(intFieldsFileReference)
+        Line Input #intFieldsFileReference, strFieldsFileLine
+        If blnNxt Then
+            strLn = strFieldsFileLine
+            blnNxt = False
+        End If
+        If Left(strFieldsFileLine, 1) = strFieldId Then
+            blnNxt = True
+        End If
+    Loop
+    Close #intFieldsFileReference
+
+    Dim strFN As String
+    Select Case Left(strLn, 1)
+        Case "C"
+            strFN = "Customer  "
+        Case "P"
+            strFN = "Product   "
+        Case "Q"
+            strFN = "Quantity  "
+        Case "R"
+            strFN = "Price     "
+    End Select
+    strLn = Left(strLn, 1) & strFN & Mid(strLn, 2)
+
+    txtMain.SelText = "SENT: " & "R" & strLn & vbCrLf
+    Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "R" & strLn
+    objWinsock.SendData "R" & strLn
+End Sub
+
+Private Sub HandleStartRequest(ByVal intAuditFileReference As Integer)
+    Dim intFieldsFileReference As Integer
+    intFieldsFileReference = FreeFile
+    Open FIELDS_FILE_NAME For Input As #intFieldsFileReference
+    Dim strFieldsFileLine As String
+    Line Input #intFieldsFileReference, strFieldsFileLine
+    Close #intFieldsFileReference
+
+    Dim strFieldName As String
+    Select Case Left(strFieldsFileLine, 1)
+        Case "C"
+            strFieldName = "Customer  "
+        Case "P"
+            strFieldName = "Product   "
+        Case "Q"
+            strFieldName = "Quantity  "
+        Case "R"
+            strFieldName = "Price     "
+    End Select
+    strFieldsFileLine = Left(strFieldsFileLine, 1) & strFieldName & Mid(strFieldsFileLine, 2)
+    txtMain.SelText = "SENT: " & "R" & strFieldsFileLine & vbCrLf
+    Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "R" & strFieldsFileLine
+    objWinsock.SendData "R" & strFieldsFileLine
+End Sub
+
+Private Sub CompleteOrder(ByVal strData As String, ByVal intAuditFileReference As Integer)
+    Dim objDocument As DOMDocument60
+    Set objDocument = New DOMDocument60
+
+    Dim blnSuccessfulLoad As Boolean
+    blnSuccessfulLoad = objDocument.loadXML(strData)
+    If Not blnSuccessfulLoad Then
+        txtMain.SelText = "SENT: " & "ECould not read data from client" & vbCrLf
+        Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "ECould not read data from client"
+        objWinsock.SendData "ECould not read data from client"
+        Exit Sub
+    End If
+
+    Dim objNodes As IXMLDOMNodeList
+    Set objNodes = objDocument.selectNodes("/xml/*")
+    Dim objFields As Collection
+    Set objFields = New Collection
+    Dim objNode As IXMLDOMNode
+    Dim objResponse As clsResponse
+    For Each objNode In objNodes
+        Set objResponse = New clsResponse
+        objResponse.FieldId = objNode.Attributes.getNamedItem("id").Text
+        objResponse.UserResponse = objNode.Text
+        objFields.Add objResponse
+    Next objNode
+
+    Dim objOrder As clsOrder
+    Set objOrder = New clsOrder
+    
+    For Each objResponse In objFields
+        Select Case objResponse.FieldId
+            Case "C"
+                objOrder.Customer = objResponse.UserResponse
+            Case "P"
+                objOrder.Product = objResponse.UserResponse
+            Case "Q"
+                objOrder.Quantity = CInt(objResponse.UserResponse)
+            Case "R"
+                objOrder.Price = CDbl(objResponse.UserResponse)
+        End Select
+    Next objResponse
+
+    Dim intOrdersFile As Integer
+    Dim strOrdersFile As String
+
+    strOrdersFile = "DB_ORDERS.TXT"
+    intOrdersFile = FreeFile
+    Open strOrdersFile For Append As #intOrdersFile
+    Print #intOrdersFile, objOrder.ToDatabaseFormat
+    Close intOrdersFile
+
+    txtMain.SelText = "SENT: " & "F" & vbCrLf
+    Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "F"
+    objWinsock.SendData "F"
+End Sub

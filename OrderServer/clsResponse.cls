@@ -13,37 +13,36 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Private m_strFID As String
-Private m_strFN As String
-Private m_strRES As String
+Private m_strFieldId As String
+Private m_strFieldName As String
+Private m_strUserResponse As String
 
-Public Property Get FID() As String
-    FID = m_strFID
-End Property
-
-Public Property Let FID(ByVal strFID As String)
-    m_strFID = strFID
-End Property
-
-Public Property Get FN() As String
-    FN = m_strFN
-End Property
-
-Public Property Let FN(ByVal strFN As String)
-    m_strFN = strFN
-End Property
-
-Public Property Get RES() As String
-    RES = m_strRES
-End Property
-
-Public Property Let RES(ByVal strRES As String)
-    m_strRES = strRES
-End Property
-
-Private Sub Class_Initialize()
-    m_strFID = ""
-    m_strFN = "Field name not found"
-    m_strRES = ""
-End Sub
-
+Public Property Get FieldId() As String
+    FieldId = m_strFieldId
+ End Property
+ 
+Public Property Let FieldId(ByVal strFieldId As String)
+    m_strFieldId = strFieldId
+ End Property
+ 
+Public Property Get FieldName() As String
+    FieldName = m_strFieldName
+ End Property
+ 
+Public Property Let FieldName(ByVal strFieldName As String)
+    m_strFieldName = strFieldName
+ End Property
+ 
+Public Property Get UserResponse() As String
+    UserResponse = m_strUserResponse
+ End Property
+ 
+Public Property Let UserResponse(ByVal strUserResponse As String)
+    m_strUserResponse = strUserResponse
+ End Property
+ 
+ Private Sub Class_Initialize()
+    m_strFieldId = ""
+    m_strFieldName = "Field name not found"
+    m_strUserResponse = ""
+ End Sub
