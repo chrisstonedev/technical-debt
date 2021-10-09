@@ -15,49 +15,49 @@ Option Explicit
 
 Private m_strLineBuffer As String * 52
 
-Public Property Get Customer() As String
-    Customer = Mid(m_strLineBuffer, 1, 10)
+Public Property Get CUS() As String
+    CUS = Mid(m_strLineBuffer, 1, 10)
 End Property
 
-Public Property Let Customer(ByVal strCustomer As String)
-    m_strLineBuffer = Left(strCustomer & Space(10), 10) & Mid(m_strLineBuffer, 11)
+Public Property Let CUS(ByVal strCUS As String)
+    m_strLineBuffer = Left(strCUS & Space(10), 10) & Mid(m_strLineBuffer, 11)
 End Property
 
-Public Property Get DateOrdered() As String
-    DateOrdered = Mid(m_strLineBuffer, 11, 19)
+Public Property Get DAT() As String
+    DAT = Mid(m_strLineBuffer, 11, 19)
 End Property
 
-Public Property Let DateOrdered(ByVal strDateOrdered As String)
-    m_strLineBuffer = Left(m_strLineBuffer, 10) & Left(strDateOrdered & Space(19), 19) & Mid(m_strLineBuffer, 30)
+Public Property Let DAT(ByVal strDAT As String)
+    m_strLineBuffer = Left(m_strLineBuffer, 10) & Left(strDAT & Space(19), 19) & Mid(m_strLineBuffer, 30)
 End Property
 
-Public Property Get Price() As Double
-    Price = Mid(m_strLineBuffer, 30, 8)
+Public Property Get PRC() As Double
+    PRC = Mid(m_strLineBuffer, 30, 8)
 End Property
 
-Public Property Let Price(ByVal dblPrice As Double)
-    m_strLineBuffer = Left(m_strLineBuffer, 29) & Left(CStr(dblPrice) & Space(8), 8) & Mid(m_strLineBuffer, 38)
+Public Property Let PRC(ByVal dblPRC As Double)
+    m_strLineBuffer = Left(m_strLineBuffer, 29) & Left(CStr(dblPRC) & Space(8), 8) & Mid(m_strLineBuffer, 38)
 End Property
 
-Public Property Get Product() As String
-    Product = Mid(m_strLineBuffer, 38, 10)
+Public Property Get PRD() As String
+    PRD = Mid(m_strLineBuffer, 38, 10)
 End Property
 
-Public Property Let Product(ByVal strProduct As String)
-    m_strLineBuffer = Left(m_strLineBuffer, 37) & Left(strProduct & Space(10), 10) & Mid(m_strLineBuffer, 48)
+Public Property Let PRD(ByVal strPRD As String)
+    m_strLineBuffer = Left(m_strLineBuffer, 37) & Left(strPRD & Space(10), 10) & Mid(m_strLineBuffer, 48)
 End Property
 
-Public Property Get Quantity() As Integer
-    Quantity = Mid(m_strLineBuffer, 48, 5)
+Public Property Get QTY() As Integer
+    QTY = Mid(m_strLineBuffer, 48, 5)
 End Property
 
-Public Property Let Quantity(ByVal intQuantity As Integer)
-    m_strLineBuffer = Left(m_strLineBuffer, 47) & Left(CStr(intQuantity) & Space(5), 5) & Mid(m_strLineBuffer, 53)
+Public Property Let QTY(ByVal intQTY As Integer)
+    m_strLineBuffer = Left(m_strLineBuffer, 47) & Left(CStr(intQTY) & Space(5), 5) & Mid(m_strLineBuffer, 53)
 End Property
 
 Private Sub Class_Initialize()
     m_strLineBuffer = ""
-    DateOrdered = Format(Now(), "yyyy-mm-dd hh:nn:ss")
+    DAT = Format(Now(), "yyyy-mm-dd hh:nn:ss")
 End Sub
 
 Public Sub FromDatabaseFormat(ByVal strLineBuffer As String)

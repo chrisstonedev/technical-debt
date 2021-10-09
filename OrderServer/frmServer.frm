@@ -109,13 +109,13 @@ End Sub
 
 Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
     Dim strData, strData2, strData3 As String
-    Dim objDoc As DOMDocument60
-    Dim blnSuccess As Boolean
-    Dim objNode As IXMLDOMNode
-    Dim objNodes As IXMLDOMNodeList
+    Dim XDC As DOMDocument60
+    Dim XP As Boolean
+    Dim ND As IXMLDOMNode
+    Dim NDS As IXMLDOMNodeList
     Dim strJson As String
-    Dim objFld As Collection
-    Dim objRes As clsResponse
+    Dim FLD As Collection
+    Dim RES As clsResponse
     Dim intFile As Integer
     Dim strFile As String
     Dim strLine As String
@@ -225,33 +225,33 @@ Private Sub objWinsock_DataArrival(ByVal bytesTotal As Long)
             Print #intFile, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "R" & strFFLn
             objWinsock.SendData "R" & strFFLn
         Case "F"
-            Set objDoc = New DOMDocument60
-            blnSuccess = objDoc.loadXML(strData)
-            If blnSuccess Then
-                Set objNodes = objDoc.selectNodes("/xml/*")
-                Set objFld = New Collection
-                For Each objNode In objNodes
-                    Set objRes = New clsResponse
-                    objRes.FieldID = objNode.Attributes.getNamedItem("id").Text
-                    objRes.UserResponse = objNode.Text
-                    objFld.Add objRes
-                Next objNode
+            Set XDC = New DOMDocument60
+            XP = XDC.loadXML(strData)
+            If XP Then
+                Set NDS = XDC.selectNodes("/xml/*")
+                Set FLD = New Collection
+                For Each ND In NDS
+                    Set RES = New clsResponse
+                    RES.FID = ND.Attributes.getNamedItem("id").Text
+                    RES.RES = ND.Text
+                    FLD.Add RES
+                Next ND
 
                 Dim objOrder As clsOrder
                 Set objOrder = New clsOrder
                 
-                For Each objRes In objFld
-                    Select Case objRes.FieldID
+                For Each RES In FLD
+                    Select Case RES.FID
                         Case "C"
-                            objOrder.Customer = objRes.UserResponse
+                            objOrder.CUS = RES.RES
                         Case "P"
-                            objOrder.Product = objRes.UserResponse
+                            objOrder.PRD = RES.RES
                         Case "Q"
-                            objOrder.Quantity = CInt(objRes.UserResponse)
+                            objOrder.QTY = CInt(RES.RES)
                         Case "R"
-                            objOrder.Price = CDbl(objRes.UserResponse)
+                            objOrder.PRC = CDbl(RES.RES)
                     End Select
-                Next objRes
+                Next RES
 
                 Dim intOrdersFile As Integer
                 Dim strOrdersFile As String
