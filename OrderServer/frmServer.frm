@@ -250,57 +250,29 @@ Private Sub HandleStartRequest(ByVal intAuditFileReference As Integer)
 End Sub
 
 Private Sub CompleteOrder(ByVal strData As String, ByVal intAuditFileReference As Integer)
-    Dim objDocument As DOMDocument60
-    Set objDocument = New DOMDocument60
+    Dim objNewMethods As OrderCore_ServerFunctions.NewMethods
+    Set objNewMethods = New OrderCore_ServerFunctions.NewMethods
 
-    Dim blnSuccessfulLoad As Boolean
-    blnSuccessfulLoad = objDocument.loadXML(strData)
-    If Not blnSuccessfulLoad Then
+    Dim strDatabaseFormat As String
+    strDatabaseFormat = objNewMethods.ProcessCompleteOrderRequest(strData)
+    
+    If Len(strDatabaseFormat) = 0 Then
         txtMain.SelText = "SENT: " & "ECould not read data from client" & vbCrLf
         Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "ECould not read data from client"
         objWinsock.SendData "ECould not read data from client"
         Exit Sub
-    End If
-
-    Dim objNodes As IXMLDOMNodeList
-    Set objNodes = objDocument.selectNodes("/xml/*")
-    Dim objFields As Collection
-    Set objFields = New Collection
-    Dim objNode As IXMLDOMNode
-    Dim objResponse As clsResponse
-    For Each objNode In objNodes
-        Set objResponse = New clsResponse
-        objResponse.FieldId = objNode.Attributes.getNamedItem("id").Text
-        objResponse.UserResponse = objNode.Text
-        objFields.Add objResponse
-    Next objNode
-
-    Dim objOrder As clsOrder
-    Set objOrder = New clsOrder
+    Else
+        Dim intOrdersFile As Integer
+        Dim strOrdersFile As String
     
-    For Each objResponse In objFields
-        Select Case objResponse.FieldId
-            Case "C"
-                objOrder.Customer = objResponse.UserResponse
-            Case "P"
-                objOrder.Product = objResponse.UserResponse
-            Case "Q"
-                objOrder.Quantity = CInt(objResponse.UserResponse)
-            Case "R"
-                objOrder.Price = CDbl(objResponse.UserResponse)
-        End Select
-    Next objResponse
-
-    Dim intOrdersFile As Integer
-    Dim strOrdersFile As String
-
-    strOrdersFile = "DB_ORDERS.TXT"
-    intOrdersFile = FreeFile
-    Open strOrdersFile For Append As #intOrdersFile
-    Print #intOrdersFile, objOrder.ToDatabaseFormat
-    Close intOrdersFile
-
-    txtMain.SelText = "SENT: " & "F" & vbCrLf
-    Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "F"
-    objWinsock.SendData "F"
+        strOrdersFile = "DB_ORDERS.TXT"
+        intOrdersFile = FreeFile
+        Open strOrdersFile For Append As #intOrdersFile
+        Print #intOrdersFile, strDatabaseFormat
+        Close intOrdersFile
+    
+        txtMain.SelText = "SENT: " & "F" & vbCrLf
+        Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "F"
+        objWinsock.SendData "F"
+    End If
 End Sub

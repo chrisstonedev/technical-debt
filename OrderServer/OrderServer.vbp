@@ -1,6 +1,7 @@
 Type=Exe
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{F5078F18-C551-11D3-89B9-0000F81FE221}#6.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\msxml6.dll#Microsoft XML, v6.0
+Reference=*\G{22AEF958-ADA1-4421-B152-9F220786C022}#1.0#0#..\OrderCore.ServerFunctions\bin\Debug\OrderCore.ServerFunctions.tlb#OrderCore_ServerFunctions
 Object={248DD890-BB45-11CF-9ABC-0080C7E7B78D}#1.0#0; MSWINSCK.OCX
 Form=frmServer.frm
 Class=clsResponse; clsResponse.cls
