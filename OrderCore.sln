@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderCore.ServerFunctions",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderCore.ServerTests", "OrderCore.ServerTests\OrderCore.ServerTests.csproj", "{1BFFABAD-A809-4C4E-88DB-C7C3CCD459B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderCore.Client.UiTests", "OrderCore.Client.UiTests\OrderCore.Client.UiTests.csproj", "{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{1BFFABAD-A809-4C4E-88DB-C7C3CCD459B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BFFABAD-A809-4C4E-88DB-C7C3CCD459B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BFFABAD-A809-4C4E-88DB-C7C3CCD459B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

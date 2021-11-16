@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="UiTestRunner.TestFramework">
+      <HintPath>..\..\ui-test-runner\UiTestRunner.TestFramework\bin\Debug\net5.0\UiTestRunner.TestFramework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
