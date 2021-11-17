@@ -10,7 +10,7 @@ namespace OrderCore.Client.UiTests
         [TestRun]
         public static async Task SuccessfulOrderTest()
         {
-            dynamic mainWindow = "new OrderCore.Client.MainWindow()";
+            var mainWindow = new MainWindow();
             mainWindow.Show();
 
             try
@@ -49,7 +49,7 @@ namespace OrderCore.Client.UiTests
         [TestRun]
         public static async Task DataValidationTest()
         {
-            dynamic mainWindow = "new OrderCore.Client.MainWindow()";
+            var mainWindow = new MainWindow();
             mainWindow.Show();
 
             try

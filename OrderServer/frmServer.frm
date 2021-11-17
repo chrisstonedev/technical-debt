@@ -150,7 +150,9 @@ Log_Error:
     On Error Resume Next
     Print #intAuditFileReference, "E" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & CStr(ErrorNumber) & ": " & ErrorDescription
     If Err.Number > 0 Then
-        MsgBox "Serious error alert!" & vbCrLf & CStr(ErrorNumber) & ": " & ErrorDescription, vbCritical, "Order Server"
+        MsgBox "Serious error alert!" & vbCrLf & CStr(Err.Number) & ": " & Err.Description, vbCritical, "Order Server"
+    Else
+        MsgBox "Some error occurred..." & vbCrLf & CStr(ErrorNumber) & ": " & ErrorDescription, vbExclamation, "Order Server"
     End If
     
     GoTo Done

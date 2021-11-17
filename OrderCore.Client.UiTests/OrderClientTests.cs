@@ -6,7 +6,7 @@ namespace OrderCore.Client.UiTests
 {
     public class OrderClientTests : TestClass
     {
-        private const string EXECUTABLE_PATH = @"..\..\..\..\OrderClient\OrderClient.exe";
+        private const string EXECUTABLE_PATH = @"..\..\..\..\..\technical-debt\OrderClient\OrderClient.exe";
         private const int MILLISECOND_DELAY_BETWEEN_STEPS = 250;
 
         [TestRun]

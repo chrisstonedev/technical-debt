@@ -1,12 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OrderCore.Client\OrderCore.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="UiTestRunner.TestFramework">
-      <HintPath>..\..\ui-test-runner\UiTestRunner.TestFramework\bin\Debug\net5.0\UiTestRunner.TestFramework.dll</HintPath>
+      <HintPath>..\..\ui-test-runner\UiTestRunner.TestFramework\bin\Debug\net6.0\UiTestRunner.TestFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
 

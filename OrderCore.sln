@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31702.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderCore.Client", "OrderCore.Client\OrderCore.Client.csproj", "{9A225499-6AA3-4740-9DE5-410953173CD1}"
 EndProject
@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderCore.ServerFunctions",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderCore.ServerTests", "OrderCore.ServerTests\OrderCore.ServerTests.csproj", "{1BFFABAD-A809-4C4E-88DB-C7C3CCD459B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderCore.Client.UiTests", "OrderCore.Client.UiTests\OrderCore.Client.UiTests.csproj", "{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderCore.Client.UiTests", "OrderCore.Client.UiTests\OrderCore.Client.UiTests.csproj", "{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
