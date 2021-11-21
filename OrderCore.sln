@@ -3,13 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UiApprovalTest.TestRunner", "UiApprovalTest.TestRunner\UiApprovalTest.TestRunner.csproj", "{1DD259D1-D53E-46D8-9BA7-15877EE5F466}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderCore.Client", "OrderCore.Client\OrderCore.Client.csproj", "{9A225499-6AA3-4740-9DE5-410953173CD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderCore.ServerFunctions", "OrderCore.ServerFunctions\OrderCore.ServerFunctions.csproj", "{22AEF958-ADA1-4421-B152-9F220786C022}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderCore.Server.Functions", "OrderCore.Server.Functions\OrderCore.Server.Functions.csproj", "{22AEF958-ADA1-4421-B152-9F220786C022}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderCore.ServerTests", "OrderCore.ServerTests\OrderCore.ServerTests.csproj", "{1BFFABAD-A809-4C4E-88DB-C7C3CCD459B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderCore.Server.UnitTests", "OrderCore.Server.UnitTests\OrderCore.Server.UnitTests.csproj", "{1BFFABAD-A809-4C4E-88DB-C7C3CCD459B0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderCore.Client.UiTests", "OrderCore.Client.UiTests\OrderCore.Client.UiTests.csproj", "{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UiApprovalTest.TestFramework", "UiApprovalTest.TestFramework\UiApprovalTest.TestFramework.csproj", "{1E3AFFB5-E09D-4F28-85E1-3189C76507DE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderCore.Client.UiTests", "OrderCore.Client.UiTests\OrderCore.Client.UiTests.csproj", "{6D3D8687-0A1C-43AF-8712-CDD5FBC508DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +21,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1DD259D1-D53E-46D8-9BA7-15877EE5F466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DD259D1-D53E-46D8-9BA7-15877EE5F466}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DD259D1-D53E-46D8-9BA7-15877EE5F466}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DD259D1-D53E-46D8-9BA7-15877EE5F466}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9A225499-6AA3-4740-9DE5-410953173CD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9A225499-6AA3-4740-9DE5-410953173CD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A225499-6AA3-4740-9DE5-410953173CD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -29,10 +37,14 @@ Global
 		{1BFFABAD-A809-4C4E-88DB-C7C3CCD459B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BFFABAD-A809-4C4E-88DB-C7C3CCD459B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BFFABAD-A809-4C4E-88DB-C7C3CCD459B0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2CAC9E8F-0FA1-4BCE-94AF-436851F73067}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E3AFFB5-E09D-4F28-85E1-3189C76507DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E3AFFB5-E09D-4F28-85E1-3189C76507DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E3AFFB5-E09D-4F28-85E1-3189C76507DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E3AFFB5-E09D-4F28-85E1-3189C76507DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D3D8687-0A1C-43AF-8712-CDD5FBC508DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D3D8687-0A1C-43AF-8712-CDD5FBC508DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D3D8687-0A1C-43AF-8712-CDD5FBC508DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D3D8687-0A1C-43AF-8712-CDD5FBC508DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

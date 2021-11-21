@@ -1,4 +1,4 @@
-﻿namespace OrderCore.ServerFunctions
+﻿namespace OrderCore.Server.Functions
 {
     public class Response
     {

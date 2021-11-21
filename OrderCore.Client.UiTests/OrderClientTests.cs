@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Threading.Tasks;
-using UiTestRunner.TestFramework;
+using UiApprovalTest.TestFramework;
 
 namespace OrderCore.Client.UiTests
 {

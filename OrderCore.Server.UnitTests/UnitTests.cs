@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using OrderCore.ServerFunctions;
+using OrderCore.Server.Functions;
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;

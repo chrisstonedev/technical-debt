@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OrderCore.ServerFunctions
+namespace OrderCore.Server.Functions
 {
     public class Order
     {

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace OrderCore.ServerFunctions
+namespace OrderCore.Server.Functions
 {
     [Guid("CC9A9CBC-054A-4C9C-B559-CE39A5EA2742")]
     [ClassInterface(ClassInterfaceType.AutoDual)]

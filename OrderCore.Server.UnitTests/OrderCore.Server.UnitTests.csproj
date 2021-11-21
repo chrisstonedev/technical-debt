@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OrderCore.ServerFunctions\OrderCore.ServerFunctions.csproj" />
+    <ProjectReference Include="..\OrderCore.Server.Functions\OrderCore.Server.Functions.csproj" />
   </ItemGroup>
 
 </Project>

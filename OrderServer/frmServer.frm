@@ -252,8 +252,8 @@ Private Sub HandleStartRequest(ByVal intAuditFileReference As Integer)
 End Sub
 
 Private Sub CompleteOrder(ByVal strData As String, ByVal intAuditFileReference As Integer)
-    Dim objNewMethods As OrderCore_ServerFunctions.NewMethods
-    Set objNewMethods = New OrderCore_ServerFunctions.NewMethods
+    Dim objNewMethods As OrderCore_Server_Functions.NewMethods
+    Set objNewMethods = New OrderCore_Server_Functions.NewMethods
 
     Dim strDatabaseFormat As String
     strDatabaseFormat = objNewMethods.ProcessCompleteOrderRequest(strData)
