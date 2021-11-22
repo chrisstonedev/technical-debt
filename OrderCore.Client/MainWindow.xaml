@@ -25,6 +25,7 @@
                 <Label Name="ErrorLabel" Grid.Row="1" FontSize="24" Foreground="Red" HorizontalAlignment="Center"></Label>
             </Grid>
         </Border>
+        <Button Name="StartButton" Grid.Row="2" Margin="150 20" FontSize="24" Click="StartButton_Click" IsEnabled="False">Candy cane</Button>
         <Button Name="StartButton" Grid.Row="2" Margin="150 20" FontSize="24" Click="StartButton_Click" IsEnabled="False">S_tart</Button>
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
