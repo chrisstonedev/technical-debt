@@ -37,10 +37,7 @@ namespace OrderCore.Client
             {
                 QuestionLabel.Content = "Click Start to begin!";
                 ErrorLabel.Content = string.Empty;
-                StartButton.Visibility = Visibility.Visible;
-                CancelButton.Visibility = Visibility.Hidden;
-                DataTextBox.Visibility = Visibility.Hidden;
-                SendButton.Visibility = Visibility.Hidden;
+                ChangeActiveView(OrderView.Start);
             }
         }
 
@@ -56,9 +53,7 @@ namespace OrderCore.Client
             if (activeFieldId.Length > 0 && activeFieldId != "\0")
             {
                 Send(socket, "T" + activeFieldId + DataTextBox.Text);
-                CancelButton.IsEnabled = false;
-                DataTextBox.IsEnabled = false;
-                SendButton.IsEnabled = false;
+                DisableButtons();
             }
             else
             {
@@ -69,10 +64,16 @@ namespace OrderCore.Client
                 }
                 strTemp += "</xml>";
                 Send(socket, "F" + strTemp);
-                CancelButton.IsEnabled = false;
-                DataTextBox.IsEnabled = false;
-                SendButton.IsEnabled = false;
+                DisableButtons();
             }
+        }
+
+        private void DisableButtons()
+        {
+            CancelButton.IsEnabled = false;
+            DataTextBox.IsEnabled = false;
+            SendButton.IsEnabled = false;
+            StartButton.IsEnabled = false;
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
@@ -105,11 +106,7 @@ namespace OrderCore.Client
                 case "C": // Connection request
                     StatusLabel.Content = "Status: Connected to Server";
                     QuestionLabel.Content = "Click to Start!";
-                    StartButton.Visibility = Visibility.Visible;
-                    StartButton.IsEnabled = true;
-                    CancelButton.Visibility = Visibility.Hidden;
-                    DataTextBox.Visibility = Visibility.Hidden;
-                    SendButton.Visibility = Visibility.Hidden;
+                    ChangeActiveView(OrderView.Start);
                     break;
                 case "R": // Request for more data
                     strData3 = strData.Length > 0 ? strData.Substring(0, 1) : string.Empty;
@@ -130,17 +127,7 @@ namespace OrderCore.Client
                         strData = strData[10..].Trim();
 
                         QuestionLabel.Content = strData;
-                        ErrorLabel.Content = string.Empty;
-                        StartButton.Visibility = Visibility.Hidden;
-                        CancelButton.Visibility = Visibility.Visible;
-                        CancelButton.IsEnabled = true;
-                        DataTextBox.Visibility = Visibility.Visible;
-                        DataTextBox.IsEnabled = true;
-                        DataTextBox.Text = string.Empty;
-                        _ = DataTextBox.Focus();
-                        SendButton.Visibility = Visibility.Visible;
-                        SendButton.IsEnabled = true;
-                        SendButton.Content = "_Send";
+                        ChangeActiveView(OrderView.TextInput);
                     }
                     else
                     {
@@ -149,26 +136,12 @@ namespace OrderCore.Client
                         {
                             QuestionLabel.Content += $"\r\n{objResponse.FieldName}: {objResponse.UserResponse}";
                         }
-                        ErrorLabel.Content = string.Empty;
-                        StartButton.Visibility = Visibility.Hidden;
-                        CancelButton.Visibility = Visibility.Visible;
-                        CancelButton.IsEnabled = true;
-                        DataTextBox.Visibility = Visibility.Hidden;
-                        DataTextBox.IsEnabled = true;
-                        DataTextBox.Text = string.Empty;
-                        SendButton.Visibility = Visibility.Visible;
-                        SendButton.IsEnabled = true;
-                        SendButton.Content = "_Submit";
-                        _ = SendButton.Focus();
+                        ChangeActiveView(OrderView.Confirmation);
                     }
                     break;
                 case "F": // Finished order
                     QuestionLabel.Content = "Order has been complete!";
-                    ErrorLabel.Content = string.Empty;
-                    StartButton.Visibility = Visibility.Visible;
-                    CancelButton.Visibility = Visibility.Hidden;
-                    DataTextBox.Visibility = Visibility.Hidden;
-                    SendButton.Visibility = Visibility.Hidden;
+                    ChangeActiveView(OrderView.Start);
                     break;
                 case "E": // Error on input
                     ErrorLabel.Content = strData;
@@ -297,13 +270,78 @@ namespace OrderCore.Client
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();
         }
-    }
 
-    public class StateObject
-    {
-        public Socket workSocket;
-        public const int BufferSize = 256;
-        public byte[] buffer = new byte[BufferSize];
-        public StringBuilder sb = new();
+        private void ChangeActiveView(OrderView newView)
+        {
+            ErrorLabel.Content = string.Empty;
+            SendButton.Content = newView == OrderView.Confirmation ? "_Submit" : "_Send";
+            StartButton.IsEnabled = true;
+            CancelButton.IsEnabled = true;
+            DataTextBox.IsEnabled = true;
+            SendButton.IsEnabled = true;
+            DataTextBox.Text = string.Empty;
+            StartButton.Visibility = SetVisibility(newView == OrderView.Start);
+            CancelButton.Visibility = SetVisibility(newView != OrderView.Start);
+            DataTextBox.Visibility = SetVisibility(newView == OrderView.TextInput);
+            SendButton.Visibility = SetVisibility(newView != OrderView.Start);
+            ItemSelection.Visibility = SetVisibility(newView == OrderView.SelectItem);
+            SetFocusForNewView(newView);
+
+            static Visibility SetVisibility(bool shouldBeVisible) => shouldBeVisible ? Visibility.Visible : Visibility.Hidden;
+
+            void SetFocusForNewView(OrderView change) => _ = change switch
+            {
+                OrderView.Start => StartButton.Focus(),
+                OrderView.TextInput => DataTextBox.Focus(),
+                OrderView.Confirmation or OrderView.SelectItem => SendButton.Focus(),
+                _ => false,
+            };
+        }
+
+        public class StateObject
+        {
+            public Socket workSocket;
+            public const int BufferSize = 256;
+            public byte[] buffer = new byte[BufferSize];
+            public StringBuilder sb = new();
+        }
+
+        public enum OrderView
+        {
+            Start,
+            TextInput,
+            Confirmation,
+            SelectItem
+        }
+
+        private void GingerbreadButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CookieButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CaneButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ChampagneButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CocoaButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void EggnogButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
