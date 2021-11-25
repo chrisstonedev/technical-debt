@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -17,6 +18,7 @@ namespace OrderCore.Client
         private string activeFieldName;
         private List<Response> allResponses;
         private Socket socket;
+        private readonly List<OrderItem> itemsSelected = new();
 
         private delegate void ParameterizedMethodInvoker(string arg);
 
@@ -52,7 +54,12 @@ namespace OrderCore.Client
             string strTemp;
             if (activeFieldId.Length > 0 && activeFieldId != "\0")
             {
-                Send(socket, "T" + activeFieldId + DataTextBox.Text);
+                var something = activeFieldId switch
+                {
+                    "I" => GetItemSelectionData(itemsSelected),
+                    _ => DataTextBox.Text,
+                };
+                Send(socket, "T" + activeFieldId + something);
                 DisableButtons();
             }
             else
@@ -66,6 +73,19 @@ namespace OrderCore.Client
                 Send(socket, "F" + strTemp);
                 DisableButtons();
             }
+        }
+
+        private static string GetItemSelectionData(List<OrderItem> itemsSelected)
+        {
+            return string.Join(string.Empty, itemsSelected.Select(item => item.ItemId).OrderBy(item => item));
+        }
+
+        private static string GetItemSelectionDisplay(List<OrderItem> itemsSelected)
+        {
+            return string.Join(Environment.NewLine, itemsSelected
+                .GroupBy(item => item.Description)
+                .OrderBy(group => group.Key)
+                .Select(group => $"{group.Count()}x {group.Key}"));
         }
 
         private void DisableButtons()
@@ -88,20 +108,17 @@ namespace OrderCore.Client
             StartClient();
         }
 
-        private void HandleDataArrival(string returnData)
+        private void HandleDataArrival(string dataReceivedFromServer)
         {
             if (!Dispatcher.CheckAccess()) // CheckAccess returns true if you're on the dispatcher thread
             {
-                _ = Dispatcher.Invoke(new ParameterizedMethodInvoker(HandleDataArrival), returnData);
+                _ = Dispatcher.Invoke(new ParameterizedMethodInvoker(HandleDataArrival), dataReceivedFromServer);
                 return;
             }
 
-            var strData = returnData;
-            string strData2;
-            string strData3;
-            strData2 = strData.Substring(0, 1);
-            strData = strData[1..];
-            switch (strData2)
+            var requestType = dataReceivedFromServer[..1];
+            var requestData = dataReceivedFromServer[1..];
+            switch (requestType)
             {
                 case "C": // Connection request
                     StatusLabel.Content = "Status: Connected to Server";
@@ -109,8 +126,8 @@ namespace OrderCore.Client
                     ChangeActiveView(OrderView.Start);
                     break;
                 case "R": // Request for more data
-                    strData3 = strData.Length > 0 ? strData.Substring(0, 1) : string.Empty;
-                    strData = strData.Length > 0 ? strData[1..] : strData;
+                    var requestFieldId = requestData.Length > 0 ? requestData[..1] : string.Empty;
+                    requestData = requestData.Length > 0 ? requestData[1..] : requestData;
                     if (activeFieldId.Length > 0)
                     {
                         allResponses.Add(new Response
@@ -120,14 +137,22 @@ namespace OrderCore.Client
                             UserResponse = DataTextBox.Text
                         });
                     }
-                    activeFieldId = strData3;
+                    activeFieldId = requestFieldId;
                     if (activeFieldId.Length > 0 && activeFieldId != "\0" && activeFieldId != string.Empty)
                     {
-                        activeFieldName = strData.Substring(0, 10).Trim();
-                        strData = strData[10..].Trim();
+                        activeFieldName = requestData[..10].Trim();
+                        requestData = requestData[10..].Trim();
 
-                        QuestionLabel.Content = strData;
-                        ChangeActiveView(OrderView.TextInput);
+                        QuestionLabel.Content = requestData;
+                        switch (activeFieldId)
+                        {
+                            case "I":
+                                ChangeActiveView(OrderView.SelectItem);
+                                break;
+                            default:
+                                ChangeActiveView(OrderView.TextInput);
+                                break;
+                        }
                     }
                     else
                     {
@@ -144,7 +169,7 @@ namespace OrderCore.Client
                     ChangeActiveView(OrderView.Start);
                     break;
                 case "E": // Error on input
-                    ErrorLabel.Content = strData;
+                    ErrorLabel.Content = requestData;
                     CancelButton.IsEnabled = true;
                     SendButton.IsEnabled = true;
                     if (DataTextBox.IsVisible)
@@ -204,10 +229,7 @@ namespace OrderCore.Client
         {
             try
             {
-                var state = new StateObject
-                {
-                    workSocket = client
-                };
+                var state = new StateObject { workSocket = client };
                 _ = client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
             }
             catch (Exception e)
@@ -244,10 +266,7 @@ namespace OrderCore.Client
 
         private static void Send(Socket client, string data)
         {
-            // Convert the string data to byte data using ASCII encoding.
             byte[] byteData = Encoding.ASCII.GetBytes(data);
-
-            // Begin sending the data to the remote device.
             _ = client.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), client);
         }
 
@@ -280,6 +299,7 @@ namespace OrderCore.Client
             DataTextBox.IsEnabled = true;
             SendButton.IsEnabled = true;
             DataTextBox.Text = string.Empty;
+            itemsSelected.Clear();
             StartButton.Visibility = SetVisibility(newView == OrderView.Start);
             CancelButton.Visibility = SetVisibility(newView != OrderView.Start);
             DataTextBox.Visibility = SetVisibility(newView == OrderView.TextInput);
@@ -314,34 +334,24 @@ namespace OrderCore.Client
             SelectItem
         }
 
-        private void GingerbreadButton_Click(object sender, RoutedEventArgs e)
-        {
+        private void GingerbreadButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("G", "Gingerbread"));
+        private void CookieButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("S", "Cookie"));
+        private void CaneButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("C", "Cane"));
+        private void ChampagneButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("W", "Champagne"));
+        private void CocoaButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("H", "Chocolate"));
+        private void EggnogButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("E", "Eggnog"));
 
+        private void AddItemToList(OrderItem item)
+        {
+            itemsSelected.Add(item);
+            RefreshItemSelectionDisplay();
         }
 
-        private void CookieButton_Click(object sender, RoutedEventArgs e)
+        private void RefreshItemSelectionDisplay()
         {
-
-        }
-
-        private void CaneButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void ChampagneButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void CocoaButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void EggnogButton_Click(object sender, RoutedEventArgs e)
-        {
-
+            throw new NotImplementedException();
         }
     }
+
+    internal record OrderItem(string ItemId, string Description);
 }
