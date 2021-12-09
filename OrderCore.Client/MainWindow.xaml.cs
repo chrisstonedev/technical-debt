@@ -7,18 +7,44 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
 namespace OrderCore.Client
 {
     public partial class MainWindow : Window
     {
         private const int port = 187;
-
+        private const string GINGERBREAD_ITEM = "Gingerbread Person";
+        private const string COOKIE_ITEM = "Sugar Cookie";
+        private const string CANDY_CANE_ITEM = "Candy Cane";
+        private const string CHAMPAGNE_ITEM = "Glass of Champagne";
+        private const string HOT_CHOCOLATE_ITEM = "Hot Chocolate";
+        private const string EGGNOG_ITEM = "Eggnog";
         private string activeFieldId = string.Empty;
         private string activeFieldName;
         private List<Response> allResponses;
         private Socket socket;
-        private readonly List<OrderItem> itemsSelected = new();
+        private readonly Dictionary<string, bool> selectableItems = new()
+        {
+            { GINGERBREAD_ITEM, false },
+            { COOKIE_ITEM, false },
+            { CANDY_CANE_ITEM, false },
+            { CHAMPAGNE_ITEM, false },
+            { HOT_CHOCOLATE_ITEM, false },
+            { EGGNOG_ITEM, false },
+        };
+
+        public Color GingerbreadBackground => GetColor(GINGERBREAD_ITEM);
+        public Color SugarCookieBackground => GetColor(COOKIE_ITEM);
+        public Color CandyCaneBackground => GetColor(CANDY_CANE_ITEM);
+        public Color ChampagneBackground => GetColor(CHAMPAGNE_ITEM);
+        public Color HotChocolateBackground => GetColor(HOT_CHOCOLATE_ITEM);
+        public Color EggnogBackground => GetColor(EGGNOG_ITEM);
+
+        private Color GetColor(string itemName)
+        {
+            return selectableItems[itemName] ? Colors.LightGreen : Colors.LightGray;
+        }
 
         private delegate void ParameterizedMethodInvoker(string arg);
 
@@ -56,7 +82,7 @@ namespace OrderCore.Client
             {
                 var something = activeFieldId switch
                 {
-                    "I" => GetItemSelectionData(itemsSelected),
+                    "I" => GetItemSelectionData(selectableItems),
                     _ => DataTextBox.Text,
                 };
                 Send(socket, "T" + activeFieldId + something);
@@ -75,17 +101,12 @@ namespace OrderCore.Client
             }
         }
 
-        private static string GetItemSelectionData(List<OrderItem> itemsSelected)
+        private static string GetItemSelectionData(Dictionary<string, bool> selectableItems)
         {
-            return string.Join(string.Empty, itemsSelected.Select(item => item.ItemId).OrderBy(item => item));
-        }
-
-        private static string GetItemSelectionDisplay(List<OrderItem> itemsSelected)
-        {
-            return string.Join(Environment.NewLine, itemsSelected
-                .GroupBy(item => item.Description)
-                .OrderBy(group => group.Key)
-                .Select(group => $"{group.Count()}x {group.Key}"));
+            return string.Join(string.Empty, selectableItems
+                .Where(selectableItem => selectableItem.Value)
+                .Select(selectedItem => selectedItem.Key)
+                .OrderBy(itemName => itemName));
         }
 
         private void DisableButtons()
@@ -299,7 +320,8 @@ namespace OrderCore.Client
             DataTextBox.IsEnabled = true;
             SendButton.IsEnabled = true;
             DataTextBox.Text = string.Empty;
-            itemsSelected.Clear();
+            foreach (var selectableItemName in selectableItems.Keys)
+                selectableItems[selectableItemName] = false;
             StartButton.Visibility = SetVisibility(newView == OrderView.Start);
             CancelButton.Visibility = SetVisibility(newView != OrderView.Start);
             DataTextBox.Visibility = SetVisibility(newView == OrderView.TextInput);
@@ -334,24 +356,16 @@ namespace OrderCore.Client
             SelectItem
         }
 
-        private void GingerbreadButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("G", "Gingerbread"));
-        private void CookieButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("S", "Cookie"));
-        private void CaneButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("C", "Cane"));
-        private void ChampagneButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("W", "Champagne"));
-        private void CocoaButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("H", "Chocolate"));
-        private void EggnogButton_Click(object sender, RoutedEventArgs e) => AddItemToList(new OrderItem("E", "Eggnog"));
+        private void GingerbreadButton_Click(object sender, RoutedEventArgs e) => ToggleItemSelection(GINGERBREAD_ITEM);
+        private void CookieButton_Click(object sender, RoutedEventArgs e) => ToggleItemSelection(COOKIE_ITEM);
+        private void CaneButton_Click(object sender, RoutedEventArgs e) => ToggleItemSelection(CANDY_CANE_ITEM);
+        private void ChampagneButton_Click(object sender, RoutedEventArgs e) => ToggleItemSelection(CHAMPAGNE_ITEM);
+        private void CocoaButton_Click(object sender, RoutedEventArgs e) => ToggleItemSelection(HOT_CHOCOLATE_ITEM);
+        private void EggnogButton_Click(object sender, RoutedEventArgs e) => ToggleItemSelection(EGGNOG_ITEM);
 
-        private void AddItemToList(OrderItem item)
+        private void ToggleItemSelection(string itemName)
         {
-            itemsSelected.Add(item);
-            RefreshItemSelectionDisplay();
-        }
-
-        private void RefreshItemSelectionDisplay()
-        {
-            throw new NotImplementedException();
+            selectableItems[itemName] = !selectableItems[itemName];
         }
     }
-
-    internal record OrderItem(string ItemId, string Description);
 }

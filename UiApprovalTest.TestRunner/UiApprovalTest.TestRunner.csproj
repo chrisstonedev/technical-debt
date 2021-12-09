@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OrderCore.Client.UiTests\OrderCore.Client.UiTests.csproj" />
-    <ProjectReference Include="..\OrderCore.Client\OrderCore.Client.csproj" />
     <ProjectReference Include="..\UiApprovalTest.TestFramework\UiApprovalTest.TestFramework.csproj" />
   </ItemGroup>
 

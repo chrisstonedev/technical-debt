@@ -86,7 +86,7 @@ namespace UiApprovalTest.TestFramework
 
         public static void CloseWindow(string windowName)
         {
-            int hwnd = FindWindow(null, windowName);
+            int hwnd = FindWindow(string.Empty, windowName);
             if (hwnd == 0)
             {
                 throw new AssertException("No window could be found to close with name " + windowName);
@@ -102,7 +102,7 @@ namespace UiApprovalTest.TestFramework
 
         public static int GetWindowHandle(string windowName)
         {
-            int hwnd = FindWindow(null, windowName);
+            int hwnd = FindWindow(string.Empty, windowName);
             if (hwnd == 0)
             {
                 throw new AssertException("Window could not be found of title " + windowName);
@@ -243,7 +243,7 @@ namespace UiApprovalTest.TestFramework
             return Rectangle.Left == _Left && Rectangle.Top == _Top && Rectangle.Right == _Right && Rectangle.Bottom == _Bottom;
         }
 
-        public override bool Equals(object Object)
+        public override bool Equals(object? Object)
         {
             if (Object is RECT rect)
             {

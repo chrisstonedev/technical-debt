@@ -6,7 +6,8 @@
         mc:Ignorable="d"
         Title="Order Client" Height="488" Width="596"
         Loaded="Window_Loaded"
-        Closing="Window_Closing">
+        Closing="Window_Closing"
+        DataContext="{Binding RelativeSource={RelativeSource self}}">
     <Grid Name="LayoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -380,6 +381,9 @@
                 </DockPanel>
             </Button>
             <Button Grid.Row="1" Grid.Column="2" Margin="5 15" Name="CaneButton" Click="CaneButton_Click">
+                <!--<Button.Backgroun--><!--d>
+                    <SolidColorBrush Color="{Binding CandyCaneBackground}"/>
+                </Button.Backgroun--><!--d>-->
                 <DockPanel>
                     <TextBlock TextWrapping="Wrap" TextAlignment="Center" DockPanel.Dock="Bottom">Candy Cane</TextBlock>
                     <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Stretch="Uniform">

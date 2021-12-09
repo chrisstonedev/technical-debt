@@ -1,5 +1,4 @@
-﻿using OrderCore.Client.UiTests;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -26,20 +25,15 @@ namespace UiApprovalTest.TestRunner
 
         private async void RunClientTestButton_Click(object sender, EventArgs e)
         {
-            var hey = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Select(t => t.Namespace);
-            //var classes = Assembly.GetExecutingAssembly().GetTypes()
-            //    .Where(t => t.Namespace.EndsWith(".UiTests", StringComparison.Ordinal))
-            //    .ToArray();
-            var classes = new Type[] { typeof(OrderClientTests), typeof(OrderCoreClientTests) };
-            var cha = AppDomain.CurrentDomain.GetAssemblies();
-            var pi = cha.Where(x => x.FullName.Contains(".UiTests,"));
-            var bar = pi.SelectMany(s => s.GetTypes()).ToArray();
-            var foo = bar.Where(p => typeof(TestClass).IsAssignableFrom(p)).ToArray();
-            var zizi = foo.SelectMany(x => x.GetMethods());
-            var lala = zizi.Where(method => method.GetCustomAttribute(typeof(TestRunAttribute), false) != null);
-            var mumu = lala.ToArray();
+            LoadReferencedAssemblies();
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var assembliesEndingInDotUiTests = loadedAssemblies.Where(x => x.FullName.Contains(".UiTests,"));
+            var allTypesFromAllUiTestAssemblies = assembliesEndingInDotUiTests.SelectMany(assembly => assembly.GetTypes()).ToArray();
+            var classesWithTestClassAttribute = allTypesFromAllUiTestAssemblies.Where(type => typeof(TestClass).IsAssignableFrom(type)).ToArray();
+            var allMethodsFromAllTestClasses = classesWithTestClassAttribute.SelectMany(x => x.GetMethods());
+            var methodsWithTestRunAttribute = allMethodsFromAllTestClasses.Where(method => method.GetCustomAttribute(typeof(TestRunAttribute), false) != null);
 
-            foreach (var method in mumu)
+            foreach (var method in methodsWithTestRunAttribute.ToArray())
             {
                 try
                 {
@@ -163,6 +157,11 @@ namespace UiApprovalTest.TestRunner
             {
                 File.Move(actualImageFile, expectedImageFile, true);
             }
+        }
+
+        private void LoadReferencedAssemblies()
+        {
+            var _ = new OrderCore.Client.UiTests.OrderClientTests();
         }
     }
 }

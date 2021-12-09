@@ -5,13 +5,16 @@ namespace OrderCore.Client.UiTests
 {
     public class OrderClientTests : TestClass
     {
-        private const string EXECUTABLE_PATH = @"..\..\..\..\..\technical-debt\OrderClient\OrderClient.exe";
         private const int MILLISECOND_DELAY_BETWEEN_STEPS = 250;
+
+
+        private const string VB6_PROGRAM_ID 
+            = @"..\OrderClient\OrderClient.exe";
 
         [TestRun]
         public static async Task SuccessfulOrderTest()
         {
-            _ = Process.Start(EXECUTABLE_PATH);
+            _ = Process.Start(VB6_PROGRAM_ID);
             await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
             var window = GetWindowHandle("Order Client");
             await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
@@ -49,7 +52,7 @@ namespace OrderCore.Client.UiTests
         [TestRun]
         public static async Task DataValidationTest()
         {
-            _ = Process.Start(EXECUTABLE_PATH);
+            _ = Process.Start(VB6_PROGRAM_ID);
             await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
             var window = GetWindowHandle("Order Client");
             await Task.Delay(MILLISECOND_DELAY_BETWEEN_STEPS);
