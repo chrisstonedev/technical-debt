@@ -61,18 +61,14 @@ Private Sub Form_Load()
     Dim intFile As Integer
     intFile = FreeFile
     Dim strLine As String
-
-    Kill FIELDS_FILE_NAME
-
     On Error Resume Next
     Open FIELDS_FILE_NAME For Input As #intFile
     If Err.Number = 53 Then
         If MsgBox("Database files cannot be found. Would you like to create them now?", vbYesNo, "OrderServer") = vbYes Then
             Open FIELDS_FILE_NAME For Output As #intFile
             Print #intFile, _
-                "PEnter product ID    " & vbCrLf & _
-                "ISelect your items   " & vbCrLf & _
-                "CEnter order comments"
+                "CEnter customer ID   " & vbCrLf & _
+                "PEnter product ID    "
             Close #intFile
         Else
             End
@@ -166,32 +162,26 @@ Private Sub ValidateUserResponse(ByVal strFieldId As String, ByVal strData As St
     Dim blnTmp As Boolean
     Select Case strFieldId
         Case "C"
-            If Len(strData) > 2 Then
+            If IsNumeric(strData) Then
                 blnTmp = True
             Else
-                txtMain.SelText = "SENT: " & "EComments value is too short" & vbCrLf
-                Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "EComments value is too short"
-                objWinsock.SendData "EComments value is too short"
+                txtMain.SelText = "SENT: " & "ECustomer ID could not be found" & vbCrLf
+                Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "ECustomer ID could not be found"
+                objWinsock.SendData "ECustomer ID could not be found"
             End If
         Case "P"
             If Len(strData) > 2 Then
                 If Len(strData) <= 10 Then
-                    If IsNumeric(strData) Then
-                        blnTmp = True
-                    Else
-                        txtMain.SelText = "SENT: " & "EPersonal ID could not be found" & vbCrLf
-                        Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "ECustomer ID could not be found"
-                        objWinsock.SendData "EPersonal ID could not be found"
-                    End If
+                    blnTmp = True
                 Else
-                    txtMain.SelText = "SENT: " & "EPersonal ID is too long" & vbCrLf
-                    Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "EPersonal ID is too long"
-                    objWinsock.SendData "EPersonal ID is too long"
+                    txtMain.SelText = "SENT: " & "EProduct ID is too long" & vbCrLf
+                    Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "EProduct ID is too long"
+                    objWinsock.SendData "EProduct ID is too long"
                 End If
             Else
-                txtMain.SelText = "SENT: " & "EPersonal ID is not long enough" & vbCrLf
-                Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "EPersonal ID is not long enough"
-                objWinsock.SendData "EPersonal ID is not long enough"
+                txtMain.SelText = "SENT: " & "EProduct ID is not long enough" & vbCrLf
+                Print #intAuditFileReference, "S" & Format(Now(), "yyyy-mm-dd hh:nn:ss") & "EProduct ID is not long enough"
+                objWinsock.SendData "EProduct ID is not long enough"
             End If
     End Select
 
@@ -221,11 +211,9 @@ Private Sub ValidateUserResponse(ByVal strFieldId As String, ByVal strData As St
     Dim strFN As String
     Select Case Left(strLn, 1)
         Case "C"
-            strFN = "Comments  "
-        Case "I"
-            strFN = "Items     "
+            strFN = "Customer  "
         Case "P"
-            strFN = "PersonalID"
+            strFN = "Product   "
         Case "Q"
             strFN = "Quantity  "
         Case "R"
@@ -249,11 +237,9 @@ Private Sub HandleStartRequest(ByVal intAuditFileReference As Integer)
     Dim strFieldName As String
     Select Case Left(strFieldsFileLine, 1)
         Case "C"
-            strFieldName = "Comments  "
-        Case "I"
-            strFieldName = "Items     "
+            strFieldName = "Customer  "
         Case "P"
-            strFieldName = "PersonalID"
+            strFieldName = "Product   "
         Case "Q"
             strFieldName = "Quantity  "
         Case "R"

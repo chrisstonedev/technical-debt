@@ -4,6 +4,7 @@
 *.vbw
 
 # Visual Studio files
+.idea/
 .vs/
 bin/
 obj/

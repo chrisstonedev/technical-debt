@@ -9,7 +9,7 @@ namespace OrderCore.Client.UiTests
 
 
         private const string VB6_PROGRAM_ID 
-            = @"..\OrderClient\OrderClient.exe";
+            = @"..\..\..\..\OrderClient\OrderClient.exe";
 
         [TestRun]
         public static async Task SuccessfulOrderTest()
